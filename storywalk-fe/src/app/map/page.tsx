@@ -5,7 +5,7 @@ import { use, useMemo, useState } from "react";
 import { reviewsApi } from "@/api/reviews";
 import type { MapPin } from "@/api/types";
 import { TraceMap, type TracePin } from "@/components/map/TraceMap";
-import { Card, Chip, PeekSheet, Screen, SectionTitle, TabBar } from "@/components/ui";
+import { Card, Chip, PeekSheet, Screen, SectionTitle, TabBar, WalkingLoader } from "@/components/ui";
 import { usePlaces } from "@/hooks/usePlaces";
 import { useT, type MsgKey } from "@/i18n";
 import { nationalityKey, shortDate } from "@/lib/format";
@@ -76,7 +76,7 @@ export default function MapPage({ searchParams }: Props) {
           <TraceMap pins={pins} selectedId={selectedId} onSelect={setSelected} className="isolate h-auto! min-h-0 flex-1 rounded-none!" />
         ) : (
           <p className="flex flex-1 items-center justify-center text-caption text-fg-muted">
-            {places.isError ? t("불러오지 못했어요. 잠시 후 다시 시도해 주세요.") : t("불러오는 중…")}
+            {places.isError ? t("불러오지 못했어요. 잠시 후 다시 시도해 주세요.") : <WalkingLoader large label={t("불러오는 중…")} />}
           </p>
         )}
         <PeekSheet
@@ -132,7 +132,7 @@ export default function MapPage({ searchParams }: Props) {
                 </li>
               ))}
               {reviews.data?.reviews.length === 0 && <li className="text-body text-fg-muted">{t("한걸음이 아직 없어요")}</li>}
-              {reviews.isPending && selectedPlace && <li className="text-body text-fg-muted">{t("불러오는 중…")}</li>}
+              {reviews.isPending && selectedPlace && <li className="text-body text-fg-muted"><WalkingLoader label={t("불러오는 중…")} /></li>}
             </ul>
           </section>
         </PeekSheet>

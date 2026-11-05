@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { visitsApi } from "@/api/visits";
 import { courseStops, CourseSteps } from "@/components/course/CourseProgress";
 import { ChevronIcon } from "@/components/icons";
-import { Button, Screen, ScreenBody, ScreenHeading, SectionTitle, Stamp, TabBar } from "@/components/ui";
+import { Button, Screen, ScreenBody, ScreenHeading, SectionTitle, Stamp, TabBar, WalkingLoader } from "@/components/ui";
 import { useLang, useT } from "@/i18n";
 import { dayLabel } from "@/lib/format";
 import { useUserStore } from "@/store/user";
@@ -51,7 +51,7 @@ export default function LogPage() {
                 ? t("도장 {stamps}개 · 코스 {courses}개 완주", { stamps: data.stampCount, courses: data.completedCourseCount })
                 : history.isError
                   ? t("불러오지 못했어요. 잠시 후 다시 시도해 주세요.")
-                  : t("불러오는 중…")
+                  : undefined
             }
           />
           <Link href="/journey" className="flex shrink-0 items-center gap-1.5 pt-2.5 text-body font-medium text-fg-sub">
@@ -59,6 +59,8 @@ export default function LogPage() {
             <ChevronIcon className="h-3 w-[7px] text-fg-muted" />
           </Link>
         </div>
+
+        {!data && !history.isError && <WalkingLoader large label={t("불러오는 중…")} />}
 
         {course && (
           <div className="flex flex-col gap-3 rounded-control bg-primary p-4">

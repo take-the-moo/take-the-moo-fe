@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { placesApi } from "@/api/places";
 import type { MapPin } from "@/api/types";
-import { Button, ImagePlaceholder, OptionRow, Screen, ScreenBody, ScreenFooter, TextField, TopBar, UploadPlaceholder } from "@/components/ui";
+import { Button, ImagePlaceholder, OptionRow, Screen, ScreenBody, ScreenFooter, TextField, TopBar, UploadPlaceholder, WalkingLoader } from "@/components/ui";
 import { useCurrentLocation } from "@/hooks/useCurrentLocation";
 import { usePlaces } from "@/hooks/usePlaces";
 import { useT } from "@/i18n";
@@ -73,7 +73,7 @@ export default function ExplainPage() {
         </div>
 
         <div role="radiogroup" aria-label={t("사진 속 장소")} className="flex flex-col gap-2.5">
-          {nearby.isPending && <p className="px-1 text-caption text-fg-muted">{t("불러오는 중…")}</p>}
+          {nearby.isPending && <p className="px-1 text-caption text-fg-muted"><WalkingLoader label={t("불러오는 중…")} /></p>}
           {nearby.isError && <p className="px-1 text-caption text-fg-muted">{t("불러오지 못했어요. 잠시 후 다시 시도해 주세요.")}</p>}
           {nearby.data?.map((place) => (
             <OptionRow

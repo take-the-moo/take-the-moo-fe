@@ -10,3 +10,5 @@ export { CheckCircle } from "./CheckCircle";
 export { OptionRow } from "./OptionRow";
 export { PeekSheet } from "./PeekSheet";
 export { Stamp } from "./Stamp";
+export { TypingText } from "./TypingText";
+export { WalkingLoader } from "./WalkingLoader";

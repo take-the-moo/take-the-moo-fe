@@ -8,7 +8,7 @@ import { nowApi } from "@/api/now";
 import type { NowQuery, NowResponse, TimeSlot, Weather } from "@/api/types";
 import { visitsApi } from "@/api/visits";
 import { ArrowUpRightIcon, CameraIcon, ChevronIcon } from "@/components/icons";
-import { Button, Card, ImagePlaceholder, Screen, ScreenBody, ScreenHeading, SectionTitle, TabBar } from "@/components/ui";
+import { Button, Card, ImagePlaceholder, Screen, ScreenBody, ScreenHeading, SectionTitle, TabBar, TypingText, WalkingLoader } from "@/components/ui";
 import { useAskWithPhoto } from "@/hooks/useAskWithPhoto";
 import { useCurrentLocation } from "@/hooks/useCurrentLocation";
 import { usePlaces } from "@/hooks/usePlaces";
@@ -81,7 +81,7 @@ export default function NowPage({ searchParams }: Props) {
         {data ? (
           <NowHeading data={data} lang={lang} />
         ) : (
-          <ScreenHeading title={t("지금, {area} 근처", { area: t("서대문") })} sub={now.isError ? undefined : t("불러오는 중…")} />
+          <ScreenHeading title={t("지금, {area} 근처", { area: t("서대문") })} />
         )}
 
         {/* 바로가기: 카메라로 묻기 → 05 */}
@@ -95,6 +95,8 @@ export default function NowPage({ searchParams }: Props) {
           <span className="min-w-0 flex-1 truncate text-left">{t("지금 보이는 걸 찍어서 물어보기")}</span>
           <ChevronIcon className="mr-2.5 shrink-0 text-fg-muted" />
         </button>
+
+        {!data && !now.isError && <WalkingLoader large label={t("불러오는 중…")} />}
 
         {now.isError && (
           <Card>
@@ -125,7 +127,7 @@ export default function NowPage({ searchParams }: Props) {
                 <span className="flex min-w-0 flex-col gap-1">
                   <span className="text-title font-bold text-point">{data.place.name}</span>
                   <span className="text-caption leading-[1.5] font-medium text-surface-sunken">
-                    {data.reason} · {t("도보 {minutes}분", { minutes: data.place.walkMinutes })}
+                    <TypingText text={`${data.reason} · ${t("도보 {minutes}분", { minutes: data.place.walkMinutes })}`} />
                   </span>
                 </span>
                 <ArrowUpRightIcon className="shrink-0 text-white" />

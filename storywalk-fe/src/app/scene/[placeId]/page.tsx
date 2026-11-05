@@ -7,7 +7,7 @@ import { ApiError } from "@/api/client";
 import { toApiLanguage, toApiNationality } from "@/api/codes";
 import { reviewsApi } from "@/api/reviews";
 import { scenesApi } from "@/api/scenes";
-import { Button, Card, Chip, ChipGroup, ImagePlaceholder, Screen, ScreenBody, ScreenFooter, TopBar } from "@/components/ui";
+import { Button, Card, Chip, ChipGroup, ImagePlaceholder, Screen, ScreenBody, ScreenFooter, TopBar, TypingText, WalkingLoader } from "@/components/ui";
 import { useAskWithPhoto } from "@/hooks/useAskWithPhoto";
 import { usePlace } from "@/hooks/usePlaces";
 import { useT, type MsgKey } from "@/i18n";
@@ -97,8 +97,8 @@ export default function ScenePage() {
           <p className="text-caption text-fg-muted">{t("30초 장면")}</p>
           {data ? (
             <>
-              <p className="text-body leading-[1.45] text-fg">{data.storyNative}</p>
-              <p className="text-body leading-[1.45] text-fg-muted">{data.storyEasyKorean}</p>
+              <p className="text-body leading-[1.45] text-fg"><TypingText text={data.storyNative} /></p>
+              <p className="text-body leading-[1.45] text-fg-muted"><TypingText text={data.storyEasyKorean} /></p>
             </>
           ) : scene.isError ? (
             <>
@@ -108,14 +108,14 @@ export default function ScenePage() {
               </Button>
             </>
           ) : (
-            <p className="text-body text-fg-muted">{t("장면을 만들고 있어요…")}</p>
+            <p className="text-body text-fg-muted"><WalkingLoader label={t("장면을 만들고 있어요…")} /></p>
           )}
         </Card>
 
         {data && (
           <div className="flex flex-col gap-2 rounded-control bg-surface-sunken p-4 font-medium">
             <p className="text-caption text-fg-muted">{t("내 나라에서는")}</p>
-            <p className="text-body leading-[1.45] text-fg">{data.connectionLine}</p>
+            <p className="text-body leading-[1.45] text-fg"><TypingText text={data.connectionLine} /></p>
           </div>
         )}
 

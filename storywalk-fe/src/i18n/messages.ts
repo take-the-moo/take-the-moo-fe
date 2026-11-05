@@ -103,7 +103,7 @@ export const messages = {
   "완료": { vi: "Xong", zh: "完成", mn: "Дуусгах", en: "Done", ja: "完了" },
 
   // ── 03 지금 ──
-  "지금, {area} 근처": { vi: "Bây giờ, gần {area}", zh: "现在，{area}附近", mn: "Одоо, {area}-ийн ойролцоо", en: "Now, near {area}", ja: "今、{area}の近く" },
+  "지금, {area} 근처": { vi: "Bây giờ, gần {area}", zh: "现在，{area}附近", mn: "Одоо, {area}-ийн ойролцоо", en: "Around {area} right now", ja: "今、{area}の近く" },
   "지금 가기 좋은 곳": { vi: "Nơi nên đến lúc này", zh: "现在适合去的地方", mn: "Одоо очиход тохиромжтой газар", en: "Good places to go now", ja: "今行くのにおすすめの場所" },
   "장소 사진 (TourAPI)": { vi: "Ảnh địa điểm (TourAPI)", zh: "地点照片（TourAPI）", mn: "Газрын зураг (TourAPI)", en: "Place photo (TourAPI)", ja: "場所の写真（TourAPI）" },
   "지난주 유학생 인기": { vi: "Được du học sinh yêu thích tuần trước", zh: "上周留学生热门", mn: "Өнгөрсөн долоо хоногт оюутнуудын дуртай газар", en: "Popular with students last week", ja: "先週の留学生に人気" },

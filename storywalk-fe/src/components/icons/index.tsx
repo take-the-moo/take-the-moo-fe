@@ -12,6 +12,16 @@ export function BackIcon(props: IconProps) {
   );
 }
 
+// 발바닥 하나 (앞꿈치·뒤꿈치). public/images/footprints.png의 모양을 단색으로 줄였다.
+export function FootprintIcon(props: IconProps) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden {...props}>
+      <path d="M12.5 2C8.5 2 6 5.5 6 9.5c0 2.5 1 4 1.5 5h8c.8-1.5 2-3.5 2-6.5C17.5 4.5 15.5 2 12.5 2Z" />
+      <path d="M8 16.5h7c0 3-1 5.5-3.5 5.5S8 19.5 8 16.5Z" />
+    </svg>
+  );
+}
+
 export function ImageIcon(props: IconProps) {
   return (
     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden {...props}>

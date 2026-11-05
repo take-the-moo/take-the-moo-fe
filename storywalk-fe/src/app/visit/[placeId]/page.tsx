@@ -8,7 +8,7 @@ import { toApiLanguage } from "@/api/codes";
 import { placesApi } from "@/api/places";
 import { visitsApi } from "@/api/visits";
 import { courseStops, CourseSteps } from "@/components/course/CourseProgress";
-import { Button, Card, Chip, ChipGroup, ImagePlaceholder, Screen, ScreenBody, ScreenFooter, Stamp, TopBar } from "@/components/ui";
+import { Button, Card, Chip, ChipGroup, ImagePlaceholder, Screen, ScreenBody, ScreenFooter, Stamp, TopBar, TypingText, WalkingLoader } from "@/components/ui";
 import { usePlace } from "@/hooks/usePlaces";
 import { useLang, useT, type MsgKey } from "@/i18n";
 import { parseDate } from "@/lib/format";
@@ -96,14 +96,14 @@ export default function VisitPage({ params, searchParams }: Props) {
             <Card className="text-body leading-[1.45] font-medium">
               {explanation.data ? (
                 <>
-                  <p className="whitespace-pre-line text-fg">{explanation.data.text}</p>
+                  <p className="whitespace-pre-line text-fg"><TypingText text={explanation.data.text} /></p>
                   {explanation.data.text !== explanation.data.original && (
-                    <p className="whitespace-pre-line text-fg-muted">{explanation.data.original}</p>
+                    <p className="whitespace-pre-line text-fg-muted"><TypingText text={explanation.data.original} /></p>
                   )}
                 </>
               ) : (
                 <p className="text-fg-muted">
-                  {explanation.isError ? t("불러오지 못했어요. 잠시 후 다시 시도해 주세요.") : t("불러오는 중…")}
+                  {explanation.isError ? t("불러오지 못했어요. 잠시 후 다시 시도해 주세요.") : <WalkingLoader label={t("불러오는 중…")} />}
                 </p>
               )}
             </Card>

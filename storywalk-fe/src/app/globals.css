@@ -37,6 +37,30 @@
   --text-body: 14px;
   --text-caption: 12px;
   --text-micro: 10px; /* 카드 태그 */
+
+  /* 움직임 */
+  --animate-walk-step: walk-step 1.8s ease-out infinite backwards; /* backwards: 차례가 오기 전엔 숨긴다 */
+  --animate-caret: caret 0.8s step-end infinite;
+
+  @keyframes walk-step {
+    0% {
+      opacity: 0;
+    }
+    10%,
+    55% {
+      opacity: 1;
+    }
+    75%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes caret {
+    50% {
+      opacity: 0;
+    }
+  }
 }
 
 body {

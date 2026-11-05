@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getAssetUrl } from "@/api/client";
 import { postcardsApi } from "@/api/postcards";
-import { Button, CheckCircle, ImagePlaceholder, Screen, ScreenBody, ScreenFooter, TopBar } from "@/components/ui";
+import { Button, CheckCircle, ImagePlaceholder, Screen, ScreenBody, ScreenFooter, TopBar, WalkingLoader } from "@/components/ui";
 import { useT } from "@/i18n";
 import { POSTCARD_SECONDS } from "@/lib/options";
 import { sharePostcard } from "@/platform/share";
@@ -69,7 +69,7 @@ export default function PostcardResultPage() {
         <div className="flex w-full flex-col gap-2 rounded-control bg-surface-sunken p-3.5" role="status" aria-live="polite">
           <div className="flex items-center gap-2.5">
             {generating ? (
-              <span aria-hidden className="size-5 shrink-0 animate-spin rounded-full border-2 border-line-strong border-t-fg" />
+              <WalkingLoader className="shrink-0" />
             ) : (
               <CheckCircle done={!failed} />
             )}
