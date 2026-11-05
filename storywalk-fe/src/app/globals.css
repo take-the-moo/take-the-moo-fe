@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+/* iOS 시스템 폰트는 한국어·베트남어 성조 부호를 모두 지원한다 */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Noto Sans", sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}

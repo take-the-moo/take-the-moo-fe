@@ -1,0 +1,39 @@
+{
+  "name": "storywalk-fe",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "ios": "CAP_ENV=dev npx cap sync ios && npx cap open ios",
+    "cap:sync": "CAP_ENV=dev npx cap sync ios"
+  },
+  "dependencies": {
+    "@capacitor/camera": "^8.2.6",
+    "@capacitor/core": "^8.6.0",
+    "@capacitor/filesystem": "^8.1.5",
+    "@capacitor/geolocation": "^8.2.4",
+    "@capacitor/ios": "^8.6.0",
+    "@capacitor/local-notifications": "^8.3.1",
+    "@capacitor/share": "^8.0.3",
+    "@tanstack/react-query": "^5.106.1",
+    "motion": "^14.9.1",
+    "next": "16.4.5",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "zustand": "^5.0.16"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.6.0",
+    "@tailwindcss/turbopack": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.5",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
