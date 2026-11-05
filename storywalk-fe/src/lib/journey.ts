@@ -22,12 +22,11 @@ export function journeyPeriod(days: { date: string }[]) {
   };
 }
 
-/** 보드에 붙일 순간들: 첫 도장, 첫 한걸음, 코스 완주, 마지막 한 줄. 칸이 남으면 최근 도장으로 채운다. */
+/** 보드에 붙일 순간들: 첫 도장, 첫 한걸음, 코스 완주, 나머지 도장, 마지막 한 줄. */
 export function journeyMoments(
   history: Pick<VisitHistory, "stamps" | "courses">,
   footsteps: Dated[],
   note: { text: string; date: string } | null,
-  limit = 4,
 ): Moment[] {
   const stamps = history.stamps.map((s) => ({ placeId: s.placeId, name: s.name, date: s.firstVisitedDate })).sort(byDate);
   if (stamps.length === 0) return [];
@@ -52,5 +51,5 @@ export function journeyMoments(
     .map((s): Moment => ({ kind: "visit", date: s.date, name: s.name }));
 
   const closing: Moment[] = note ? [{ kind: "note", date: note.date, name: stamps.at(-1)!.name, text: note.text }] : [];
-  return [...[...picked, ...recent].slice(0, limit - closing.length).sort(byDate), ...closing];
+  return [...[...picked, ...recent].sort(byDate), ...closing];
 }

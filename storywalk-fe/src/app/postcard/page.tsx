@@ -34,7 +34,7 @@ export default function PostcardPage() {
     try {
       const photoId = await uploadCapturedPhoto(photo, userId);
       const postcard = await postcardsApi.create({ userId, photoId, comment: note.trim() });
-      startJob(postcard.postcardId);
+      startJob(postcard.postcardId, photo.placeId);
       router.push("/postcard/result");
     } catch {
       setError(true);

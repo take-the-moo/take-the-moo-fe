@@ -4,12 +4,14 @@ import { useQuery } from "@tanstack/react-query";
 import { use, useMemo, useState } from "react";
 import { reviewsApi } from "@/api/reviews";
 import type { MapPin } from "@/api/types";
+import { PostcardFlyIn } from "@/components/map/PostcardFlyIn";
 import { TraceMap, type TracePin } from "@/components/map/TraceMap";
 import { Card, Chip, PeekSheet, Screen, SectionTitle, TabBar, WalkingLoader } from "@/components/ui";
 import { usePlaces } from "@/hooks/usePlaces";
 import { useT, type MsgKey } from "@/i18n";
 import { nationalityKey, shortDate } from "@/lib/format";
 import { MAP_FILTERS, NATIONALITIES } from "@/lib/options";
+import { usePostcardStore } from "@/store/postcard";
 import { useUserStore } from "@/store/user";
 import { cn } from "@/lib/cn";
 
@@ -43,6 +45,8 @@ export default function MapPage({ searchParams }: Props) {
   const { placeId: initialId } = use(searchParams);
   const t = useT();
   const userId = useUserStore((s) => s.userId);
+  const flyingPostcard = usePostcardStore((s) => s.flying);
+  const landPostcard = usePostcardStore((s) => s.land);
   const places = usePlaces();
   const [nationality, setNationality] = useState<string>("전체");
   const [thisWeek, setThisWeek] = useState(false);
@@ -138,6 +142,10 @@ export default function MapPage({ searchParams }: Props) {
         </PeekSheet>
       </div>
       <TabBar />
+      {flyingPostcard && (
+        // 방문자가 없는 장소는 핀이 없어서 첫 핀으로 들어간다
+        <PostcardFlyIn src={flyingPostcard} pinId={pins.some((p) => p.id === selectedId) ? (selectedId ?? undefined) : pins[0]?.id} onDone={landPostcard} />
+      )}
     </Screen>
   );
 }

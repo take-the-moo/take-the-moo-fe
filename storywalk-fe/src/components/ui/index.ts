@@ -9,6 +9,7 @@ export { TextField, TextArea, FieldLabel } from "./Field";
 export { CheckCircle } from "./CheckCircle";
 export { OptionRow } from "./OptionRow";
 export { PeekSheet } from "./PeekSheet";
+export { POSTCARD_FLY, PostcardFly } from "./PostcardFly";
 export { Stamp } from "./Stamp";
 export { TypingText } from "./TypingText";
 export { WalkingLoader } from "./WalkingLoader";

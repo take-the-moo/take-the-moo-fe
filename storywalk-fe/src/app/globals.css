@@ -95,6 +95,12 @@ body {
   animation: none;
 }
 
+/* 공유한 엽서가 지도 화면 가운데로 옮겨 간다. 핀으로 들어가는 움직임은 PostcardFlyIn이 맡는다 */
+::view-transition-group(.postcard-fly) {
+  z-index: 200;
+  animation-duration: 300ms;
+}
+
 @keyframes screen-out {
   to {
     opacity: 0;

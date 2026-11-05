@@ -19,7 +19,7 @@ const PIN_SIZE = 48;
 const pinHtml = (pin: TracePin, selected: boolean) => {
   const ring = selected ? "box-shadow:0 0 0 3px #fcff5b;" : "";
   const label = `<div style="position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:4px;padding:4px 6px;border-radius:19px;background:#fff;pointer-events:none;font-size:12px;font-weight:500;color:#1d1d1d;white-space:nowrap">${pin.label}</div>`;
-  return `<div style="position:relative;width:${PIN_SIZE}px;height:${PIN_SIZE}px;border-radius:50%;background:#1d1d1d;color:#fcff5b;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;cursor:pointer;filter:drop-shadow(0 0 6.45px rgba(0,0,0,.25));${ring}">${pin.count}${label}</div>`;
+  return `<div data-pin-id="${pin.id}" style="position:relative;width:${PIN_SIZE}px;height:${PIN_SIZE}px;border-radius:50%;background:#1d1d1d;color:#fcff5b;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;cursor:pointer;filter:drop-shadow(0 0 6.45px rgba(0,0,0,.25));${ring}">${pin.count}${label}</div>`;
 };
 
 export function TraceMap({ pins, selectedId, onSelect, className }: Props) {
@@ -123,6 +123,7 @@ function Schematic({ pins, selectedId, onSelect }: Omit<Props, "className">) {
         return (
           <button
             key={pin.id}
+            data-pin-id={pin.id}
             type="button"
             onClick={() => onSelect(pin.id)}
             aria-pressed={selected}

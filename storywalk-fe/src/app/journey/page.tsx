@@ -19,7 +19,8 @@ import { useUserStore } from "@/store/user";
 // 한걸음 수와 마지막 한 줄은 서버가 작성자를 내보내지 않아 이 기기의 기록으로 보여준다.
 // shortcut: 이야기는 AI 생성이 아니라 고정 문장이다. 서버에 생성 API가 생기면 바꾼다.
 const NOTE_MAX = 40;
-// 보드 위 카드·핀의 위치 (Figma 321×350 기준)
+// 보드 위 카드·핀의 위치 (Figma 321×350 기준). 순간이 더 많으면 보드를 아래로 이어 붙인다.
+const BOARD_SIZE = 4;
 const CARDS = [
   { left: 0, top: 3, rotate: "3.73deg" },
   { left: 165, top: 21, rotate: "-4.67deg" },
@@ -60,6 +61,7 @@ export default function JourneyPage() {
   const [draft, setDraft] = useState<string | null>(null); // null이면 입력창을 닫은 상태
   const [saving, setSaving] = useState(false);
   const [saveFailed, setSaveFailed] = useState(false);
+  const [revealed, setRevealed] = useState(false); // 한 번 저장하면 카드를 다 펼친 채로 둔다
 
   const data = history.data;
   const period = data ? journeyPeriod(data.days) : null;
@@ -73,6 +75,8 @@ export default function JourneyPage() {
     setSaving(true);
     setSaveFailed(false);
     try {
+      setRevealed(true);
+      await new Promise((resolve) => setTimeout(resolve, 100)); // 스크롤 전이라 숨어 있거나 나오는 중인 카드까지 펼쳐진 뒤 찍는다
       // shortcut: 글꼴을 넣지 않아 저장 이미지는 기기 기본 글꼴이다. 10MB 가변 글꼴을 인라인하지 않으려는 선택으로, 서브셋 글꼴이 생기면 바꾼다.
       const blob = await toBlob(board.current, { backgroundColor: "#ffffff", pixelRatio: 2, skipFonts: true });
       if (!blob) throw new Error("이미지를 만들지 못했어요");
@@ -145,7 +149,11 @@ export default function JourneyPage() {
                 {moments.length === 0 ? (
                   <p className="text-body text-fg-muted">{t("아직 남긴 순간이 없어요")}</p>
                 ) : (
-                  <MomentBoard moments={moments} image={image} lang={lang} />
+                  <div className="flex flex-col gap-5">
+                    {Array.from({ length: Math.ceil(moments.length / BOARD_SIZE) }, (_, i) => (
+                      <MomentBoard key={`${i}-${revealed}`} moments={moments.slice(i * BOARD_SIZE, (i + 1) * BOARD_SIZE)} image={image} lang={lang} revealed={revealed} connected={(i + 1) * BOARD_SIZE < moments.length} />
+                    ))}
+                  </div>
                 )}
               </section>
             </>
@@ -196,21 +204,37 @@ export default function JourneyPage() {
 }
 
 // 사진 카드 4장을 실로 이은 보드. 순간이 적으면 있는 카드까지만 잇는다.
-// 카드는 핀과 함께 한 장씩 나오고, 실은 이어지는 카드가 나온 뒤에 나타난다.
+// 카드는 화면에 들어올 때 핀과 함께 한 장씩 나오고, 실은 이어지는 카드가 나온 뒤에 나타난다.
+// revealed는 이미지 저장용이다. 진행 중인 애니메이션은 끊기지 않아서 key를 바꿔 다시 그릴 때 처음부터 다 펼친 상태로 그린다.
 // CSS 애니메이션 대신 motion을 쓴다: 저장 이미지(html-to-image)가 복제한 CSS 애니메이션은 첫 프레임(투명)으로 찍힌다.
-function MomentBoard({ moments, image, lang }: { moments: Moment[]; image: (name: string) => string | null; lang: string | null }) {
+function MomentBoard({
+  moments,
+  image,
+  lang,
+  revealed,
+  connected,
+}: {
+  moments: Moment[];
+  image: (name: string) => string | null;
+  lang: string | null;
+  revealed: boolean;
+  connected: boolean;
+}) {
   const t = useT();
   const count = moments.length;
   const reduced = useReducedMotion();
   const appear = (step: number, from?: { y: number; scale: number }) => ({
-    initial: reduced ? false : { opacity: 0, ...from },
-    animate: { opacity: 1, y: 0, scale: 1 },
+    initial: reduced || revealed ? false : { opacity: 0, ...from },
+    whileInView: { opacity: 1, y: 0, scale: 1 },
+    viewport: { once: true, amount: 0.2 },
     transition: { delay: step * MOMENT_STEP, duration: 0.35 },
   });
 
   return (
     <div className="relative mx-auto h-[350px] w-[321px]">
       {count >= 3 && <motion.img {...appear(2)} src="/images/journey/string-back.svg" alt="" className="absolute top-[28px] left-[82px]" />}
+      {/* 다음 보드로 넘어가는 실: 마지막 핀에서 다음 보드의 첫 핀까지. 2번→3번 카드 실과 간격이 같아 그대로 쓴다 */}
+      {connected && <motion.img {...appear(4)} src="/images/journey/string-back.svg" alt="" className="absolute top-[215px] left-[82px]" />}
       {moments.map((m, i) => (
         <motion.article
           {...appear(i, { y: 14, scale: 0.94 })}

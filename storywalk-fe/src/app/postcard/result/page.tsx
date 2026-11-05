@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getAssetUrl } from "@/api/client";
 import { postcardsApi } from "@/api/postcards";
-import { Button, CheckCircle, ImagePlaceholder, Screen, ScreenBody, ScreenFooter, TopBar, WalkingLoader } from "@/components/ui";
+import { Button, CheckCircle, ImagePlaceholder, POSTCARD_FLY, PostcardFly, Screen, ScreenBody, ScreenFooter, TopBar, WalkingLoader } from "@/components/ui";
 import { useT } from "@/i18n";
 import { POSTCARD_SECONDS } from "@/lib/options";
 import { sharePostcard } from "@/platform/share";
@@ -22,6 +22,7 @@ export default function PostcardResultPage() {
   const router = useRouter();
   const t = useT();
   const job = usePostcardStore((s) => s.job);
+  const fly = usePostcardStore((s) => s.fly);
   const [now, setNow] = useState(() => Date.now());
   const [saveError, setSaveError] = useState<string | null>(null);
 
@@ -49,6 +50,12 @@ export default function PostcardResultPage() {
 
   const expectedMs = POSTCARD_SECONDS * 1000;
   const progress = job && generating ? Math.min(0.9, (now - job.startedAt) / expectedMs) : 1;
+
+  // 장소를 모르는 사진(이 화면 흐름에서 바로 고른 사진)은 지도가 처음 고르는 핀으로 들어간다
+  const shareToMap = () => {
+    if (imageUrl) fly(imageUrl);
+    router.push(job?.placeId ? `/map?placeId=${job.placeId}` : "/map", { transitionTypes: [POSTCARD_FLY] });
+  };
 
   const save = async () => {
     if (!downloadUrl) {
@@ -88,11 +95,13 @@ export default function PostcardResultPage() {
           )}
         </div>
 
-        <ImagePlaceholder
-          src={imageUrl}
-          label={generating ? t("엽서를 그리는 중…") : t("나의 서대문 엽서")}
-          className="aspect-[2/3] rounded-[3px]! border border-[#1f1f1e]"
-        />
+        <PostcardFly>
+          <ImagePlaceholder
+            src={imageUrl}
+            label={generating ? t("엽서를 그리는 중…") : t("나의 서대문 엽서")}
+            className="aspect-[2/3] rounded-[3px]! border border-[#1f1f1e]"
+          />
+        </PostcardFly>
         {saveError && (
           <p role="alert" className="text-caption text-fg">
             {saveError}
@@ -101,7 +110,7 @@ export default function PostcardResultPage() {
       </ScreenBody>
       <ScreenFooter className="flex-row!">
         {/* 트리거 17: 흔적 지도에 공유 → 07 / 트리거 18: 이미지 저장 */}
-        <Button variant="secondary" className="flex-1" disabled={generating} onClick={() => router.push("/map")}>
+        <Button variant="secondary" className="flex-1" disabled={generating} onClick={shareToMap}>
           {t("흔적 지도에 공유")}
         </Button>
         <Button className="flex-1" disabled={generating || !imageUrl} onClick={save}>
