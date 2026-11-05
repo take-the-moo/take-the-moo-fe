@@ -139,7 +139,6 @@ storywalk-fe/
 │   ├── mocks/        # 샘플 데이터·개발용 API 응답
 │   └── lib/          # 공용 유틸리티
 ├── ios/              # Capacitor iOS 프로젝트
-├── public/           # 정적 자산
 ├── docs/             # 아키텍처·개발 지침·API 협의 문서
 ├── capacitor.config.ts
 └── next.config.ts    # Next.js 설정·백엔드 API 프록시

@@ -195,7 +195,6 @@ storywalk-fe/
 │   ├── mocks/handlers.ts      # 개발용 목 응답
 │   └── platform/             # 지도·위치·카메라·알림·공유
 ├── ios/App/                   # Xcode 프로젝트·Capacitor 브리지
-├── public/                    # 정적 자산
 ├── .env.example               # 공개 가능한 설정 예시
 ├── next.config.ts             # API 프록시
 ├── capacitor.config.ts        # 앱 식별자·개발 서버·webDir
