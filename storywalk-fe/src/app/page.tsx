@@ -20,6 +20,7 @@ import {
 } from "@/components/ui";
 import { useAskWithPhoto } from "@/hooks/useAskWithPhoto";
 import { useCurrentLocation } from "@/hooks/useCurrentLocation";
+import { usePlaces } from "@/hooks/usePlaces";
 import { useLang, useT, type MsgKey } from "@/i18n";
 import { useLoggedIn, useUserHydrated, useUserStore } from "@/store/user";
 
@@ -56,6 +57,7 @@ export default function NowPage({ searchParams }: Props) {
   const language = useUserStore((s) => s.language);
   const { ask, busy } = useAskWithPhoto();
   const location = useCurrentLocation();
+  const places = usePlaces(); // 인기 카드 사진: weeklyPopular에는 imageUrl이 없어 장소 목록에서 찾는다
 
   // 시연 좌표·역이 있으면 기기 위치 대신 쓴다
   const position = "lat" in demo || "stationId" in demo ? {} : location.data ?? {};
@@ -113,7 +115,11 @@ export default function NowPage({ searchParams }: Props) {
                     // 인기 장소 카드도 04로 연결된다 (v3.1 피드백)
                     <Link key={p.placeId} href={`/scene/${p.placeId}`} className="flex min-w-0 flex-1">
                       <Card className="gap-1.5! p-2.5!">
-                        <ImagePlaceholder className="h-[52px]" />
+                        <ImagePlaceholder
+                          src={places.data?.find((pin) => pin.placeId === p.placeId)?.imageUrl}
+                          label={p.name}
+                          className="h-[52px]"
+                        />
                         <p className="text-body font-bold leading-[1.45] text-fg">{p.name}</p>
                         <p className="text-caption leading-[1.45] text-fg-muted">{t("유학생 {count}명", { count: p.visitorCount })}</p>
                       </Card>
