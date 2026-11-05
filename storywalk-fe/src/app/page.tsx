@@ -1,30 +1,87 @@
 "use client";
 
-import { useState } from "react";
-import { api } from "@/api/client";
-import { getCurrentPosition } from "@/platform/location";
-import { notifyNearby } from "@/platform/notify";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import {
+  Button,
+  Card,
+  Chip,
+  ChipGroup,
+  ImagePlaceholder,
+  Screen,
+  ScreenBody,
+  ScreenHeading,
+  SectionTitle,
+  TabBar,
+} from "@/components/ui";
+import { useAskWithPhoto } from "@/hooks/useAskWithPhoto";
+import { NOW } from "@/mocks/sample";
+import { useUserHydrated, useUserStore } from "@/store/user";
 
-// 세팅 확인용 화면. 동작 확인 후 '지금' 화면으로 교체한다.
-export default function Home() {
-  const [log, setLog] = useState<string[]>([]);
-  const push = (s: string) => setLog((l) => [s, ...l]);
+// 03 지금 (홈) · F2 — Figma 1:376
+// 추천 내용은 GET /now 연동 전까지 샘플 데이터다. 진입 시 위치 1회 조회도 /now 연동과 함께 붙인다.
+export default function NowPage() {
+  const router = useRouter();
+  const hydrated = useUserHydrated();
+  const userId = useUserStore((s) => s.userId);
+  const { ask, busy } = useAskWithPhoto();
+
+  // 첫 실행(익명 사용자 없음)이면 00 시작 선택으로 보낸다.
+  useEffect(() => {
+    if (hydrated && !userId) router.replace("/start");
+  }, [hydrated, userId, router]);
+
+  if (!hydrated || !userId) return <Screen>{null}</Screen>;
+
+  const { recommendation: rec } = NOW;
 
   return (
-    <div className="flex flex-col gap-3 p-4">
-      <h1 className="text-xl font-bold">세팅 확인</h1>
-      <button className="rounded-lg bg-black p-3 text-white" onClick={async () => {
-        try { push(JSON.stringify(await api("/health"))); } catch (e) { push(`API 실패: ${e}`); }
-      }}>API 호출</button>
-      <button className="rounded-lg bg-black p-3 text-white" onClick={async () => {
-        try { const p = await getCurrentPosition(); push(`위치: ${p.lat}, ${p.lng}`); } catch (e) { push(`위치 실패: ${e}`); }
-      }}>현재 위치</button>
-      <button className="rounded-lg bg-black p-3 text-white" onClick={async () => {
-        await notifyNearby("dongnimmun", "독립문 근처에 있어요", "100년 전 이곳 이야기를 들어볼래요?");
-        push("3초 뒤 알림 (앱을 홈으로 내려서 확인)");
-      }}>근처 알림 테스트</button>
-      <a className="rounded-lg bg-black p-3 text-center text-white" href="/dev/map-check">지도·거리뷰 검증</a>
-      <pre className="whitespace-pre-wrap rounded-lg bg-neutral-100 p-3 text-xs">{log.join("\n")}</pre>
-    </div>
+    <Screen>
+      <ScreenBody>
+        <ScreenHeading title={`지금, ${NOW.area} 근처`} sub={NOW.summary} />
+        <ChipGroup>
+          {NOW.context.map((c) => (
+            <Chip key={c}>{c}</Chip>
+          ))}
+        </ChipGroup>
+
+        <SectionTitle>지금 가기 좋은 곳</SectionTitle>
+        <Card>
+          <ImagePlaceholder label="장소 사진 (TourAPI)" className="h-[104px]" />
+          <p className="text-[18px] font-bold leading-[1.45] text-fg">{rec.place.name}</p>
+          <p className="text-label leading-[1.45] text-fg-caption">{rec.reason}</p>
+          <ChipGroup>
+            {rec.tags.map((t) => (
+              <Chip key={t}>{t}</Chip>
+            ))}
+          </ChipGroup>
+          {/* 트리거 6: 장면 보기 → 04 */}
+          <Button onClick={() => router.push(`/scene/${rec.place.id}`)}>장면 보기</Button>
+        </Card>
+
+        <SectionTitle>지난주 유학생 인기</SectionTitle>
+        <div className="flex gap-2.5">
+          {NOW.popular.map(({ place, count }) => (
+            // 인기 장소 카드도 04로 연결된다 (v3.1 피드백)
+            <Link key={place.id} href={`/scene/${place.id}`} className="flex min-w-0 flex-1">
+              <Card className="gap-1.5! p-2.5!">
+                <ImagePlaceholder className="h-[52px]" />
+                <p className="text-body font-bold leading-[1.45] text-fg">{place.name}</p>
+                <p className="text-caption leading-[1.45] text-fg-muted">유학생 {count}명</p>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      </ScreenBody>
+
+      <div className="px-5 py-2">
+        {/* 바로가기: 카메라로 묻기 → 05 */}
+        <Button variant="secondary" onClick={ask} disabled={busy}>
+          지금 보이는 걸 찍어서 물어보기
+        </Button>
+      </div>
+      <TabBar />
+    </Screen>
   );
 }

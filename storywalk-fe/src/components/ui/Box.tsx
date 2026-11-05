@@ -12,6 +12,7 @@ export function InfoBox({ className, children }: Props) {
 }
 
 // Figma: rec-card · card — 흰 바탕 테두리 카드 (radius 14, padding 16)
+// cn은 클래스를 병합하지 않으므로, 기본값과 같은 속성(gap·padding·방향)을 바꿀 때는 `gap-2!`처럼 !를 붙인다.
 export function Card({ className, children }: Props) {
   return (
     <div className={cn("flex w-full flex-col gap-2.5 rounded-box border border-line bg-surface p-4", className)}>

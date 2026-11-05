@@ -11,8 +11,9 @@
   --color-ink: #141414; /* 화면 대제목 */
   --color-fg: #262626; /* 기본 본문·제목 */
   --color-fg-sub: #4d4d4d; /* 보조 설명, 기본 칩 */
+  --color-fg-caption: #737373; /* 카드 라벨·부제 (Figma #737373·#666·#595959 계열을 하나로) */
   --color-fg-muted: #808080; /* 캡션, 플레이스홀더 */
-  --color-fg-disabled: #999999; /* 비활성 탭 */
+  --color-fg-disabled: #999999; /* 비활성 탭, 진행 단계 화살표·빈 원 */
 
   /* 면 */
   --color-primary: #333333; /* 주 버튼, 선택 칩 */
@@ -20,6 +21,8 @@
   --color-surface: #ffffff;
   --color-surface-sunken: #f2f2f2; /* 안내 박스, 기본 칩 */
   --color-surface-placeholder: #e0e0e0; /* 이미지 자리 */
+  --color-surface-subtle: #fafafa; /* 사진 추가 칸 */
+  --color-dim: rgb(0 0 0 / 0.35); /* 바텀시트 뒤 */
 
   /* 선 */
   --color-line-subtle: #e0e0e0; /* 탭바 상단 */
@@ -33,9 +36,12 @@
   --radius-control: 12px; /* 버튼, 입력, 이미지 자리 */
   --radius-box: 14px; /* 안내 박스, 카드 */
   --radius-pill: 16px; /* 칩 */
+  --radius-field: 10px; /* 텍스트 입력 */
+  --radius-sheet: 24px; /* 바텀시트 상단, 로고 */
 
   /* 글자 크기 */
   --text-display: 28px;
+  --text-heading: 22px; /* 탭 화면 제목 (지금·흔적 지도·나의 기록) */
   --text-title: 20px;
   --text-headline: 17px; /* 상단 바 제목 */
   --text-body-lg: 16px; /* 섹션 제목, 버튼 */

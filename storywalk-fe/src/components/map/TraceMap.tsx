@@ -1,0 +1,134 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { loadNaverMaps, toLatLng, type LngLat } from "@/platform/map";
+import { cn } from "@/lib/cn";
+
+// Figma: 07 'map' — 장소별 방문 수 원형 핀 + 이름. 개인 위치가 아니라 장소 집계만 표시한다(F6).
+// 네이버 지도 SDK가 준비되면 실제 지도 위에, 키 미설정·인증 실패 시엔 Figma 와이어프레임과 같은
+// 개략도(좌표를 상자 안에 비례 배치)로 그린다. 시연 환경에서 지도 문제로 화면이 비지 않게 하기 위함이다.
+export type TracePin = { id: string; label: string; count: number; at: LngLat };
+
+type Props = { pins: TracePin[]; selectedId: string; onSelect: (id: string) => void; className?: string };
+
+const pinHtml = (pin: TracePin, selected: boolean) => {
+  const size = selected ? 40 : 30;
+  const bg = selected ? "#141414" : "#595959";
+  return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;transform:translate(-50%,-${size / 2}px);cursor:pointer">
+    <div style="width:${size}px;height:${size}px;border-radius:50%;background:${bg};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:${selected ? 13 : 11}px">${pin.count}</div>
+    <div style="font-size:10px;font-weight:700;color:#333;white-space:nowrap;text-shadow:0 0 2px #fff">${pin.label}</div>
+  </div>`;
+};
+
+export function TraceMap({ pins, selectedId, onSelect, className }: Props) {
+  const el = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<naver.maps.Map | null>(null);
+  const [mode, setMode] = useState<"loading" | "map" | "fallback">("loading");
+  const onSelectRef = useRef(onSelect);
+  useEffect(() => {
+    onSelectRef.current = onSelect;
+  });
+
+  // 지도 생성 (1회)
+  useEffect(() => {
+    let cancelled = false;
+    const onAuthFailure = () => {
+      mapRef.current?.destroy();
+      mapRef.current = null;
+      setMode("fallback");
+    };
+    window.addEventListener("naver-maps-auth-failure", onAuthFailure);
+    loadNaverMaps()
+      .then(() => {
+        if (cancelled || !el.current) return;
+        const bounds = new naver.maps.LatLngBounds(toLatLng(pins[0].at), toLatLng(pins[0].at));
+        pins.forEach((p) => bounds.extend(toLatLng(p.at)));
+        const map = new naver.maps.Map(el.current, { bounds, mapDataControl: false, scaleControl: false, logoControl: true });
+        mapRef.current = map;
+        setMode("map");
+      })
+      .catch(() => !cancelled && setMode("fallback"));
+    return () => {
+      cancelled = true;
+      window.removeEventListener("naver-maps-auth-failure", onAuthFailure);
+      mapRef.current?.destroy();
+      mapRef.current = null;
+    };
+    // 핀 목록이 바뀌어도 지도는 다시 만들지 않는다 (아래 효과가 마커만 갱신)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 마커 (핀·선택 변경 시 다시 그림)
+  useEffect(() => {
+    const map = mapRef.current;
+    if (mode !== "map" || !map) return;
+    const markers = pins.map((pin) => {
+      const marker = new naver.maps.Marker({
+        map,
+        position: toLatLng(pin.at),
+        title: `${pin.label} · ${pin.count}명`,
+        icon: { content: pinHtml(pin, pin.id === selectedId) },
+        zIndex: pin.id === selectedId ? 10 : 1,
+      });
+      naver.maps.Event.addListener(marker, "click", () => onSelectRef.current(pin.id));
+      return marker;
+    });
+    return () =>
+      markers.forEach((m) => {
+        naver.maps.Event.clearInstanceListeners(m);
+        m.setMap(null);
+      });
+  }, [mode, pins, selectedId]);
+
+  return (
+    <div className={cn("relative h-[220px] w-full overflow-hidden rounded-box bg-surface-sunken", className)}>
+      <div ref={el} className={cn("absolute inset-0", mode !== "map" && "invisible")} />
+      {mode === "fallback" && <Schematic pins={pins} selectedId={selectedId} onSelect={onSelect} />}
+    </div>
+  );
+}
+
+// 지도 SDK 없이 그리는 개략도. 실제 거리 비례로 놓으면 가까운 장소(형무소역사관·독립문)가 겹쳐서,
+// 경도·위도의 '순위'로 배치한다. 동서·남북 방향 관계만 유지하고 간격은 고르게 편다.
+function Schematic({ pins, selectedId, onSelect }: Omit<Props, "className">) {
+  const rank = (values: number[], v: number) => {
+    const sorted = [...new Set(values)].sort((a, b) => a - b);
+    return sorted.length > 1 ? sorted.indexOf(v) / (sorted.length - 1) : 0.5;
+  };
+  const lngs = pins.map((p) => p.at[0]);
+  const lats = pins.map((p) => p.at[1]);
+  const x = (lng: number) => 14 + rank(lngs, lng) * 72; // 좌우 14% 여백
+  const y = (lat: number) => 20 + (1 - rank(lats, lat)) * 58; // 북쪽이 위. 아래는 이름표 자리만큼 더 비운다
+
+  return (
+    <div className="absolute inset-0" aria-label="장소별 방문 수 개략도">
+      {/* 길 표시 (장식) */}
+      <div aria-hidden className="absolute top-[30%] -left-5 h-2.5 w-[115%] -rotate-12 bg-surface" />
+      <div aria-hidden className="absolute -top-5 left-[54%] h-[120%] w-2.5 bg-surface" />
+      {pins.map((pin) => {
+        const selected = pin.id === selectedId;
+        return (
+          <button
+            key={pin.id}
+            type="button"
+            onClick={() => onSelect(pin.id)}
+            aria-pressed={selected}
+            aria-label={`${pin.label} 방문 ${pin.count}명`}
+            style={{ left: `${x(pin.at[0])}%`, top: `${y(pin.at[1])}%` }}
+            className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-0.5"
+          >
+            <span
+              className={cn(
+                "flex items-center justify-center rounded-full font-bold text-on-primary",
+                selected ? "size-10 bg-ink text-label" : "size-[30px] bg-[#595959] text-micro",
+              )}
+            >
+              {pin.count}
+            </span>
+            <span className="text-[10px] leading-[1.45] font-bold whitespace-nowrap text-primary">{pin.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
