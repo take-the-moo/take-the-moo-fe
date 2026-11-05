@@ -9,7 +9,7 @@ import { reviewsApi } from "@/api/reviews";
 import { PlusIcon } from "@/components/icons";
 import { Button, ImagePlaceholder, InfoBox, Screen, ScreenBody, ScreenFooter, SectionTitle, TextArea, TopBar } from "@/components/ui";
 import { usePlace } from "@/hooks/usePlaces";
-import { useT } from "@/i18n";
+import { useT, type MsgKey } from "@/i18n";
 import { toUploadFile } from "@/lib/image";
 import { takePhoto } from "@/platform/camera";
 import { useUserStore } from "@/store/user";
@@ -76,7 +76,7 @@ export default function ReviewPage() {
       <TopBar title={t("한걸음 남기기")} />
       <ScreenBody className="gap-8! pt-2!">
         <div className="flex items-center gap-2 self-start rounded-[20px] bg-surface-sunken px-3 py-2">
-          <span className="text-body font-bold text-fg">{place?.name ?? t("알 수 없는 장소")}</span>
+          <span className="text-body font-bold text-fg">{place ? t(place.name as MsgKey) : t("알 수 없는 장소")}</span>
           <span className="text-caption font-medium text-fg-muted">{t("방문 완료")}</span>
         </div>
 

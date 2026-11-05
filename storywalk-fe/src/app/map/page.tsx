@@ -9,7 +9,7 @@ import { PostcardFlyIn } from "@/components/map/PostcardFlyIn";
 import { TraceMap, type TracePin } from "@/components/map/TraceMap";
 import { Card, Chip, PeekSheet, Screen, SectionTitle, TabBar, WalkingLoader } from "@/components/ui";
 import { usePlaces } from "@/hooks/usePlaces";
-import { useT, type MsgKey } from "@/i18n";
+import { t as translate, useLang, useT, type MsgKey } from "@/i18n";
 import { nationalityKey, shortDate } from "@/lib/format";
 import { MAP_FILTERS, NATIONALITIES } from "@/lib/options";
 import { usePostcardStore } from "@/store/postcard";
@@ -36,10 +36,10 @@ const filterCode = (label: string) => NATIONALITIES.find((n) => n.label === labe
 const routePlaceIds = (history?: VisitHistory) =>
   new Set([...(history?.stamps ?? []), ...(history?.courses.flatMap((c) => c.stops) ?? [])].map((p) => String(p.placeId)));
 
-function toPins(pins: MapPin[], code: string | null, route: Set<string>): TracePin[] {
+function toPins(pins: MapPin[], code: string | null, route: Set<string>, lang: string | null): TracePin[] {
   const counted = pins.map((p) => ({
     id: String(p.placeId),
-    label: p.name,
+    label: translate(lang, p.name as MsgKey),
     count: code ? (p.nationalities.find((n) => n.nationality === code)?.count ?? 0) : p.visitorCount,
     at: [p.longitude, p.latitude] as [number, number],
   }));
@@ -50,6 +50,7 @@ function toPins(pins: MapPin[], code: string | null, route: Set<string>): TraceP
 export default function MapPage({ searchParams }: Props) {
   const { placeId: initialId } = use(searchParams);
   const t = useT();
+  const lang = useLang();
   const userId = useUserStore((s) => s.userId);
   const flyingPostcard = usePostcardStore((s) => s.flying);
   const landPostcard = usePostcardStore((s) => s.land);
@@ -65,8 +66,8 @@ export default function MapPage({ searchParams }: Props) {
   });
 
   const pins = useMemo(
-    () => toPins(places.data ?? [], filterCode(nationality), routePlaceIds(history.data)),
-    [places.data, nationality, history.data],
+    () => toPins(places.data ?? [], filterCode(nationality), routePlaceIds(history.data), lang),
+    [places.data, nationality, history.data, lang],
   );
   const selectedId = selected ?? pins[0]?.id ?? null;
   const selectedPlace = places.data?.find((p) => String(p.placeId) === selectedId);
@@ -100,7 +101,7 @@ export default function MapPage({ searchParams }: Props) {
         )}
         <PeekSheet
           keep={MAP_MIN_HEIGHT}
-          label={selectedPlace?.name ?? t("흔적 지도")}
+          label={selectedPlace ? t(selectedPlace.name as MsgKey) : t("흔적 지도")}
           head={
             <div className="flex justify-between gap-1.5 overflow-x-auto [scrollbar-width:none]">
               {MAP_FILTERS.map((f) => (
@@ -116,7 +117,7 @@ export default function MapPage({ searchParams }: Props) {
         >
           <Card className="gap-3!">
             <p className="text-body font-bold text-fg">
-              {t("{place} · 다녀간 유학생 {count}명", { place: selectedPlace?.name ?? "", count: selectedPlace?.visitorCount ?? 0 })}
+              {t("{place} · 다녀간 유학생 {count}명", { place: selectedPlace ? t(selectedPlace.name as MsgKey) : "", count: selectedPlace?.visitorCount ?? 0 })}
             </p>
             {stats.length > 0 && (
               <div className="flex flex-col gap-2">

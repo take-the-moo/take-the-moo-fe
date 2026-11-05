@@ -82,7 +82,7 @@ export default function VisitPage({ params, searchParams }: Props) {
 
   return (
     <Screen>
-      <TopBar title={placeName} />
+      <TopBar title={t(placeName as MsgKey)} />
       {explain && (
         <ImagePlaceholder label={t("내가 찍은 사진")} src={photo?.url ?? placeImage(placeName, place?.imageUrl)} className="h-[245px] shrink-0 rounded-none!" />
       )}
@@ -116,7 +116,7 @@ export default function VisitPage({ params, searchParams }: Props) {
             <div className="flex min-w-0 flex-1 flex-col gap-2">
               <p className="text-headline font-bold text-fg">{t(stampText.title)}</p>
               <p className="text-caption font-medium text-fg-muted">
-                {stamp ? `${stamp.placeName} · ${dateLabel(parseDate(stamp.visitedDate), lang)}` : stampText.sub && t(stampText.sub)}
+                {stamp ? `${t(stamp.placeName as MsgKey)} · ${dateLabel(parseDate(stamp.visitedDate), lang)}` : stampText.sub && t(stampText.sub)}
               </p>
             </div>
           </div>
@@ -142,7 +142,7 @@ export default function VisitPage({ params, searchParams }: Props) {
         </Button>
         {next ? (
           <Button className="flex-1" onClick={() => router.push(`/scene/${next.placeId}`)}>
-            {t("다음: {place} {walk}", { place: next.name, walk: t("{minutes}분", { minutes: next.walkingMinutes }) })}
+            {t("다음: {place} {walk}", { place: t(next.name as MsgKey), walk: t("{minutes}분", { minutes: next.walkingMinutes }) })}
           </Button>
         ) : (
           <Button className="flex-1" onClick={() => router.push("/log")}>

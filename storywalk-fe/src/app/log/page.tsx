@@ -7,7 +7,7 @@ import { visitsApi } from "@/api/visits";
 import { courseStops, CourseSteps } from "@/components/course/CourseProgress";
 import { ChevronIcon } from "@/components/icons";
 import { Button, Screen, ScreenBody, ScreenHeading, SectionTitle, Stamp, TabBar, WalkingLoader } from "@/components/ui";
-import { useLang, useT } from "@/i18n";
+import { useLang, useT, type MsgKey } from "@/i18n";
 import { dayLabel } from "@/lib/format";
 import { useUserStore } from "@/store/user";
 import { cn } from "@/lib/cn";
@@ -85,7 +85,7 @@ export default function LogPage() {
                     )}
                   >
                     <Stamp size={48} done={done} />
-                    {name}
+                    {t(name as MsgKey)}
                     <span className="sr-only">{done ? t("도장 받음") : t("아직 방문 전")}</span>
                   </li>
                 ))}
@@ -101,7 +101,7 @@ export default function LogPage() {
                     {i < data.days.length - 1 && <span aria-hidden className="absolute top-6 bottom-2 left-[7.5px] w-px bg-track" />}
                     <div className="flex min-w-0 flex-1 flex-col gap-1 text-body">
                       <p className="font-bold text-fg">{dayLabel(d.date, lang)}</p>
-                      <p className="font-medium text-fg-muted">{t("{places}에 다녀왔어요", { places: d.places.map((p) => p.name).join(" · ") })}</p>
+                      <p className="font-medium text-fg-muted">{t("{places}에 다녀왔어요", { places: d.places.map((p) => t(p.name as MsgKey)).join(" · ") })}</p>
                     </div>
                   </li>
                 ))}

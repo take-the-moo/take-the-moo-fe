@@ -60,7 +60,7 @@ export default function ScenePage() {
 
   return (
     <Screen>
-      <TopBar title={data?.placeName ?? place?.name ?? ""} />
+      <TopBar title={t((data?.placeName ?? place?.name ?? "") as MsgKey)} />
       <ImagePlaceholder
         label={t("대표 이미지")}
         src={placeImage(data?.placeName ?? place?.name, place?.imageUrl)}

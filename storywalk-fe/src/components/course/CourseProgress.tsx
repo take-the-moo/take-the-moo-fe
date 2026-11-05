@@ -2,7 +2,7 @@
 
 import { Fragment } from "react";
 import { CheckCircle } from "@/components/ui";
-import { useT } from "@/i18n";
+import { useT, type MsgKey } from "@/i18n";
 import { cn } from "@/lib/cn";
 
 // Figma: 06 'card/독립 코스' · 08 'card/코스 완주'의 steps — ✓원(20) + 이름 → 화살표 → …
@@ -30,7 +30,7 @@ export function CourseSteps({ stops, doneIds, dark = false }: { stops: CourseSto
             <li className="flex items-center gap-1.5">
               <CheckCircle done={done} />
               <span className={cn(dark ? "font-medium text-white" : done ? "font-bold text-fg-sub" : "font-medium text-fg-muted")}>
-                {stop.shortName}
+                {t(stop.shortName as MsgKey)}
                 <span className="sr-only">{` ${done ? t("방문 완료") : t("아직 방문 전")}`}</span>
               </span>
             </li>

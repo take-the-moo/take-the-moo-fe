@@ -39,8 +39,9 @@ const seoulToday = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seou
 function momentLabel(m: Moment, t: ReturnType<typeof useT>) {
   if (m.kind === "note") return `“${m.text}”`;
   if (m.kind === "course") return t("{course} 완주", { course: m.text ?? "" });
-  if (m.kind === "step") return t("첫 한걸음 · {place}", { place: m.name });
-  return m.kind === "stamp" ? t("첫 도장 · {place}", { place: m.name }) : m.name;
+  if (m.kind === "step") return t("첫 한걸음 · {place}", { place: t(m.name as MsgKey) });
+  const place = t(m.name as MsgKey);
+  return m.kind === "stamp" ? t("첫 도장 · {place}", { place }) : place;
 }
 
 export default function JourneyPage() {
@@ -242,7 +243,7 @@ function MomentBoard({
           style={CARDS[i]}
           className="absolute flex w-[146px] flex-col gap-2.5 rounded-control border border-line bg-surface px-2 pt-2 pb-2.5"
         >
-          <ImagePlaceholder src={image(m.name)} label={m.name} className="h-[78px]" />
+          <ImagePlaceholder src={image(m.name)} label={t(m.name as MsgKey)} className="h-[78px]" />
           <div className="flex flex-col gap-1.5 font-medium">
             <p className="text-caption text-fg">{monthDay(m.date, lang)}</p>
             <p className="truncate text-micro text-fg-muted">{momentLabel(m, t)}</p>

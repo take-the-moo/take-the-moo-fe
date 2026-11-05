@@ -8,7 +8,7 @@ import type { MapPin } from "@/api/types";
 import { Button, ImagePlaceholder, OptionRow, Screen, ScreenBody, ScreenFooter, TextField, TopBar, UploadPlaceholder, WalkingLoader } from "@/components/ui";
 import { useCurrentLocation } from "@/hooks/useCurrentLocation";
 import { usePlaces } from "@/hooks/usePlaces";
-import { useT } from "@/i18n";
+import { useT, type MsgKey } from "@/i18n";
 import { distanceLabel } from "@/lib/format";
 import { takePhoto } from "@/platform/camera";
 import { useCaptureStore, useLatestPhoto } from "@/store/capture";
@@ -46,7 +46,9 @@ export default function ExplainPage() {
     }
   };
 
-  const results = query.trim() ? (places.data ?? []).filter((p) => p.name.includes(query.trim())).slice(0, 8) : [];
+  // 화면에는 번역된 이름이 보이므로 한글 이름과 번역된 이름 둘 다로 찾는다
+  const q = query.trim().toLowerCase();
+  const results = q ? (places.data ?? []).filter((p) => p.name.includes(q) || t(p.name as MsgKey).toLowerCase().includes(q)).slice(0, 8) : [];
   const selected = choice ?? (nearby.data?.[0] ? String(nearby.data[0].placeId) : null);
   const targetId = selected === SEARCH ? picked?.placeId : selected ? Number(selected) : undefined;
 
@@ -78,14 +80,14 @@ export default function ExplainPage() {
           {nearby.data?.map((place) => (
             <OptionRow
               key={place.placeId}
-              title={place.name}
+              title={t(place.name as MsgKey)}
               sub={distanceLabel(place.distanceMeters)}
               selected={selected === String(place.placeId)}
               onSelect={() => setChoice(String(place.placeId))}
             />
           ))}
           <OptionRow
-            title={picked ? picked.name : t("여기 없어요")}
+            title={picked ? t(picked.name as MsgKey) : t("여기 없어요")}
             sub={picked ? t("직접 검색해서 골랐어요") : t("직접 검색하기")}
             selected={selected === SEARCH}
             onSelect={() => setChoice(SEARCH)}
@@ -111,7 +113,7 @@ export default function ExplainPage() {
                 }}
                 className="rounded-control px-3.5 py-2 text-left text-body text-fg active:bg-surface-sunken"
               >
-                {p.name}
+                {t(p.name as MsgKey)}
               </button>
             ))}
             {query.trim() && results.length === 0 && (

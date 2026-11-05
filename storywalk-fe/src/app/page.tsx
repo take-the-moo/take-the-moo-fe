@@ -115,7 +115,7 @@ export default function NowPage({ searchParams }: Props) {
               href={`/scene/${data.place.placeId}`}
               className="relative flex h-[300px] flex-col justify-end gap-3 overflow-hidden rounded-control bg-surface-placeholder px-4 pt-4 pb-5 shadow-[0_0_13.6px_rgba(0,0,0,0.08)]"
             >
-              <ImagePlaceholder label={data.place.name} src={placeImage(data.place.name, data.place.imageUrl)} className="absolute inset-0 h-full rounded-none!" />
+              <ImagePlaceholder label={t(data.place.name as MsgKey)} src={placeImage(data.place.name, data.place.imageUrl)} className="absolute inset-0 h-full rounded-none!" />
               <span aria-hidden className="absolute inset-0 bg-linear-to-b from-black/5 from-40% to-black" />
               <span className="relative flex flex-wrap gap-2">
                 {Boolean(myCount) && (
@@ -125,7 +125,7 @@ export default function NowPage({ searchParams }: Props) {
               </span>
               <span className="relative flex items-end justify-between gap-3">
                 <span className="flex min-w-0 flex-col gap-1">
-                  <span className="text-title font-bold text-point">{data.place.name}</span>
+                  <span className="text-title font-bold text-point">{t(data.place.name as MsgKey)}</span>
                   <span className="text-caption leading-[1.5] font-medium text-surface-sunken">
                     <TypingText text={`${data.reason} · ${t("도보 {minutes}분", { minutes: data.place.walkMinutes })}`} />
                   </span>
@@ -143,9 +143,9 @@ export default function NowPage({ searchParams }: Props) {
               {data.weeklyPopular.slice(0, 2).map((p) => (
                 // 인기 장소 카드도 04로 연결된다 (v3.1 피드백)
                 <Link key={p.placeId} href={`/scene/${p.placeId}`} className="flex min-w-0 flex-1 flex-col gap-2.5 overflow-hidden rounded-control border border-line pb-2.5">
-                  <ImagePlaceholder label={p.name} src={placeImage(p.name, pin(p.placeId)?.imageUrl)} className="aspect-[170/103] rounded-none! object-top" />
+                  <ImagePlaceholder label={t(p.name as MsgKey)} src={placeImage(p.name, pin(p.placeId)?.imageUrl)} className="aspect-[170/103] rounded-none! object-top" />
                   <span className="flex flex-col gap-2 px-2 font-medium">
-                    <span className="truncate text-body-lg text-fg">{p.name}</span>
+                    <span className="truncate text-body-lg text-fg">{t(p.name as MsgKey)}</span>
                     <span className="text-caption text-fg-muted">{t("유학생 {count}명", { count: p.visitorCount })}</span>
                   </span>
                 </Link>
