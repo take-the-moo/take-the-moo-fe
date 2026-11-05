@@ -23,6 +23,7 @@ export default function Home() {
         await notifyNearby("dongnimmun", "독립문 근처에 있어요", "100년 전 이곳 이야기를 들어볼래요?");
         push("3초 뒤 알림 (앱을 홈으로 내려서 확인)");
       }}>근처 알림 테스트</button>
+      <a className="rounded-lg bg-black p-3 text-center text-white" href="/dev/map-check">지도·거리뷰 검증</a>
       <pre className="whitespace-pre-wrap rounded-lg bg-neutral-100 p-3 text-xs">{log.join("\n")}</pre>
     </div>
   );
