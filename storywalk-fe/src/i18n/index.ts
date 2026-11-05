@@ -23,8 +23,7 @@ export function useLang(): string | null {
   return LANGS.includes(device) ? device : "en";
 }
 
-// lang을 주면 저장된 언어 대신 그 언어로 보여준다 (처음 설정에서 고르는 중인 언어).
-export function useT(lang?: string) {
-  const current = useLang();
-  return (key: MsgKey, vars?: Vars) => t(lang ?? current, key, vars);
+export function useT() {
+  const lang = useLang();
+  return (key: MsgKey, vars?: Vars) => t(lang, key, vars);
 }

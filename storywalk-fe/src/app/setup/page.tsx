@@ -26,7 +26,7 @@ export default function SetupPage() {
   const [nationality, setNationality] = useState<string>("VN");
   const [language, setLanguage] = useState<string>("vi");
   const [status, setStatus] = useState<Status>({ kind: "idle" });
-  const t = useT(language); // 고르는 즉시 화면에 반영한다
+  const t = useT(); // 고른 언어는 가입 후(시작하기)부터 적용한다. 고르는 중에는 화면 언어를 바꾸지 않는다
 
   useEffect(() => {
     if (!draft && status.kind === "idle") router.replace("/signup");
