@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button, Card, Chip, ChipGroup, ImagePlaceholder, Screen, ScreenBody, ScreenFooter, TopBar } from "@/components/ui";
 import { useAskWithPhoto } from "@/hooks/useAskWithPhoto";
+import { useT } from "@/i18n";
 import { findPlace, languageLabel, NATIONALITIES, SCENE } from "@/mocks/sample";
 import { useUserStore } from "@/store/user";
 
@@ -13,6 +14,7 @@ import { useUserStore } from "@/store/user";
 export default function ScenePage() {
   const { placeId } = useParams<{ placeId: string }>();
   const router = useRouter();
+  const t = useT();
   const place = findPlace(placeId);
   const language = useUserStore((s) => s.language);
   const myNationality = useUserStore((s) => s.nationality);
@@ -22,22 +24,24 @@ export default function ScenePage() {
 
   if (!place) return <NotFound />;
 
+  const lensLabel = NATIONALITIES.find((n) => n.code === lens)?.label;
+
   return (
     <Screen>
       <TopBar title={place.name} />
       <ScreenBody className="gap-3!">
-        <ImagePlaceholder label="대표 이미지" className="h-[150px]" />
+        <ImagePlaceholder label={t("대표 이미지")} className="h-[150px]" />
 
         <ChipGroup>
           <Chip selected={!lens} onClick={() => setLens(null)}>
-            {languageLabel(language)} + 쉬운 한국어
+            {t("{language} + 쉬운 한국어", { language: t(languageLabel(language)) })}
           </Chip>
           <Chip
             selected={Boolean(lens)}
             aria-expanded={lensOpen}
             onClick={() => setLensOpen((v) => !v)}
           >
-            {lens ? `${NATIONALITIES.find((n) => n.code === lens)?.label} 시선` : "다른 나라 시선"} ▾
+            {lensLabel ? t("{country} 시선", { country: t(lensLabel) }) : t("다른 나라 시선")} ▾
           </Chip>
         </ChipGroup>
         {lensOpen && (
@@ -51,25 +55,25 @@ export default function ScenePage() {
                   setLensOpen(false);
                 }}
               >
-                {n.label}
+                {t(n.label)}
               </Chip>
             ))}
           </ChipGroup>
         )}
 
         <Card className="gap-2! leading-[1.45]">
-          <p className="text-caption font-bold text-fg-caption">30초 장면</p>
+          <p className="text-caption font-bold text-fg-caption">{t("30초 장면")}</p>
           <p className="text-body font-medium text-ink">{SCENE.native}</p>
           <p className="text-label text-fg-caption">{SCENE.easyKorean}</p>
         </Card>
 
         <div className="flex flex-col gap-2 rounded-box bg-surface-sunken p-4 leading-[1.45]">
-          <p className="text-caption font-bold text-fg-caption">내 나라에서는</p>
+          <p className="text-caption font-bold text-fg-caption">{t("내 나라에서는")}</p>
           <p className="text-label font-medium text-fg">{SCENE.myCountry}</p>
         </div>
 
         <Card className="gap-2! leading-[1.45]">
-          <p className="text-caption font-bold text-fg-caption">먼저 다녀간 유학생의 한걸음</p>
+          <p className="text-caption font-bold text-fg-caption">{t("먼저 다녀간 유학생의 한걸음")}</p>
           <p className="text-body font-medium text-ink">“{SCENE.footstep.text}”</p>
           <p className="text-caption text-fg-muted">{SCENE.footstep.meta}</p>
         </Card>
@@ -77,10 +81,10 @@ export default function ScenePage() {
       <ScreenFooter className="flex-row!">
         {/* 트리거 8: 사진으로 묻기 → 05 / 트리거 9: 방문 완료 → 06 (도장만) */}
         <Button variant="secondary" className="flex-1" onClick={ask} disabled={busy}>
-          사진으로 묻기
+          {t("사진으로 묻기")}
         </Button>
         <Button className="flex-1" onClick={() => router.push(`/visit/${place.id}?mode=stamp`)}>
-          방문 완료
+          {t("방문 완료")}
         </Button>
       </ScreenFooter>
     </Screen>
@@ -88,11 +92,12 @@ export default function ScenePage() {
 }
 
 function NotFound() {
+  const t = useT();
   return (
     <Screen>
-      <TopBar title="장소를 찾을 수 없어요" />
+      <TopBar title={t("장소를 찾을 수 없어요")} />
       <ScreenBody>
-        <p className="text-body text-fg-sub">주소가 바뀌었거나 아직 준비되지 않은 장소예요.</p>
+        <p className="text-body text-fg-sub">{t("주소가 바뀌었거나 아직 준비되지 않은 장소예요.")}</p>
       </ScreenBody>
     </Screen>
   );

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { api } from "@/api/client";
 import { Button, Chip, ChipGroup, Divider, Screen, ScreenFooter } from "@/components/ui";
+import { useT } from "@/i18n";
 import { LANGUAGES, NATIONALITIES } from "@/mocks/sample";
 import { getCurrentPosition } from "@/platform/location";
 import { useUserStore } from "@/store/user";
@@ -20,6 +21,7 @@ export default function SetupPage() {
   const [nationality, setNationality] = useState<string>("VN");
   const [language, setLanguage] = useState<string>("vi");
   const [status, setStatus] = useState<Status>({ kind: "idle" });
+  const t = useT(language); // 고르는 즉시 화면에 반영한다
 
   const pickNationality = (code: string, defaultLang: string) => {
     setNationality(code);
@@ -35,7 +37,7 @@ export default function SetupPage() {
       });
       setUser({ userId: user.userId, nationality, language });
     } catch {
-      setStatus({ kind: "error", message: "시작하지 못했어요. 잠시 후 다시 시도해 주세요." });
+      setStatus({ kind: "error", message: t("시작하지 못했어요. 잠시 후 다시 시도해 주세요.") });
       return;
     }
     // 위치 권한 요청 — 허용하면 위치 1회 사용. 결과는 저장하지 않는다.
@@ -47,33 +49,31 @@ export default function SetupPage() {
     <Screen>
       <div className="flex flex-1 flex-col gap-5 px-5 pt-12 pb-3">
         <div className="flex flex-col gap-5 leading-[1.45]">
-          <h1 className="text-[30px] font-bold text-ink">서대문 발자취</h1>
-          <p className="text-[15px] text-fg-caption">
-            서대문을 다녀간 유학생들의 발자취를 따라
-            <br />
-            오늘의 한 장면을 만나요.
+          <h1 className="text-[30px] font-bold text-ink">{t("서대문 발자취")}</h1>
+          <p className="text-[15px] whitespace-pre-line text-fg-caption">
+            {t("서대문을 다녀간 유학생들의 발자취를 따라\n오늘의 한 장면을 만나요.")}
           </p>
         </div>
         <Divider />
 
-        <h2 className="text-body-lg leading-[1.45] font-bold text-fg">어느 나라에서 왔어요?</h2>
+        <h2 className="text-body-lg leading-[1.45] font-bold text-fg">{t("어느 나라에서 왔어요?")}</h2>
         <ChipGroup>
           {NATIONALITIES.map((n) => (
             <Chip key={n.code} selected={nationality === n.code} onClick={() => pickNationality(n.code, n.defaultLang)}>
-              {n.label}
+              {t(n.label)}
             </Chip>
           ))}
         </ChipGroup>
 
-        <h2 className="text-body-lg leading-[1.45] font-bold text-fg">어떤 언어로 볼까요?</h2>
+        <h2 className="text-body-lg leading-[1.45] font-bold text-fg">{t("어떤 언어로 볼까요?")}</h2>
         <ChipGroup>
           {LANGUAGES.map((l) => (
             <Chip key={l.code} selected={language === l.code} onClick={() => setLanguage(l.code)}>
-              {l.label}
+              {t(l.label)}
             </Chip>
           ))}
         </ChipGroup>
-        <p className="text-caption leading-[1.45] text-fg-muted">* 장면은 선택한 언어 + 쉬운 한국어로 함께 보여줘요.</p>
+        <p className="text-caption leading-[1.45] text-fg-muted">{t("* 장면은 선택한 언어 + 쉬운 한국어로 함께 보여줘요.")}</p>
       </div>
 
       <ScreenFooter>
@@ -82,11 +82,11 @@ export default function SetupPage() {
             {status.message}
           </p>
         ) : (
-          <p className="text-center text-caption text-fg-muted">로그인 없이 시작 · 이름·연락처는 받지 않아요</p>
+          <p className="text-center text-caption text-fg-muted">{t("로그인 없이 시작 · 이름·연락처는 받지 않아요")}</p>
         )}
         {/* 트리거 5 */}
         <Button onClick={start} disabled={status.kind === "saving"}>
-          {status.kind === "saving" ? "준비하는 중…" : "시작하기"}
+          {status.kind === "saving" ? t("준비하는 중…") : t("시작하기")}
         </Button>
       </ScreenFooter>
     </Screen>

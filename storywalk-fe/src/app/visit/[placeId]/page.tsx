@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { use } from "react";
 import { CourseSteps } from "@/components/course/CourseProgress";
 import { Button, Card, Chip, ChipGroup, ImagePlaceholder, Screen, ScreenBody, ScreenFooter, TopBar } from "@/components/ui";
+import { useLang, useT } from "@/i18n";
 import { EXPLANATION, findPlace, INDEPENDENCE_COURSE, languageLabel } from "@/mocks/sample";
 import { useLatestPhoto } from "@/store/capture";
 import { useUserStore } from "@/store/user";
@@ -17,12 +18,15 @@ type Props = {
   searchParams: Promise<{ mode?: string }>;
 };
 
-const dateLabel = (d: Date) => `${d.getMonth() + 1}/${d.getDate()} (${"일월화수목금토"[d.getDay()]})`;
+const dateLabel = (d: Date, lang: string | null) =>
+  new Intl.DateTimeFormat(lang ?? "ko", { month: "numeric", day: "numeric", weekday: "short" }).format(d);
 
 export default function VisitPage({ params, searchParams }: Props) {
   const { placeId } = use(params);
   const { mode } = use(searchParams);
   const router = useRouter();
+  const t = useT();
+  const lang = useLang();
   const place = findPlace(placeId);
   const photo = useLatestPhoto();
   const language = useUserStore((s) => s.language);
@@ -30,7 +34,7 @@ export default function VisitPage({ params, searchParams }: Props) {
   if (!place) {
     return (
       <Screen>
-        <TopBar title="장소를 찾을 수 없어요" />
+        <TopBar title={t("장소를 찾을 수 없어요")} />
       </Screen>
     );
   }
@@ -48,10 +52,10 @@ export default function VisitPage({ params, searchParams }: Props) {
       <ScreenBody className="gap-3!">
         {explain && (
           <>
-            <ImagePlaceholder label="내가 찍은 사진" src={photo?.url} className="h-[130px]" />
+            <ImagePlaceholder label={t("내가 찍은 사진")} src={photo?.url} className="h-[130px]" />
             <ChipGroup>
-              <Chip selected>저장된 해설</Chip>
-              <Chip>{languageLabel(language)}로 번역</Chip>
+              <Chip selected>{t("저장된 해설")}</Chip>
+              <Chip>{t("{language}로 번역", { language: t(languageLabel(language)) })}</Chip>
             </ChipGroup>
             <Card className="gap-2! leading-[1.45]">
               <p className="text-body font-medium text-ink">{EXPLANATION.translated}</p>
@@ -62,12 +66,12 @@ export default function VisitPage({ params, searchParams }: Props) {
 
         <Card className="h-[100px] flex-row! items-center gap-3!">
           <div className="flex size-16 shrink-0 items-center justify-center rounded-full border-[3px] border-dashed border-ink text-label font-bold text-ink">
-            도장
+            {t("도장")}
           </div>
           <div className="flex min-w-0 flex-1 flex-col gap-0.5 leading-[1.45]">
-            <p className="text-body-lg font-bold text-fg">방문 도장 획득!</p>
+            <p className="text-body-lg font-bold text-fg">{t("방문 도장 획득!")}</p>
             <p className="truncate text-caption text-fg-muted">
-              {place.name} · {dateLabel(new Date())}
+              {place.name} · {dateLabel(new Date(), lang)}
             </p>
           </div>
         </Card>
@@ -84,15 +88,15 @@ export default function VisitPage({ params, searchParams }: Props) {
       <ScreenFooter className="flex-row!">
         {/* 트리거 11: 한걸음 남기기 → N3 / 트리거 12: 다음 장소 → 04 복귀 */}
         <Button variant="secondary" className="flex-1" onClick={() => router.push(`/visit/${place.id}/review`)}>
-          한걸음 남기기
+          {t("한걸음 남기기")}
         </Button>
         {next ? (
           <Button className="flex-1" onClick={() => router.push(`/scene/${next.id}`)}>
-            다음: {next.shortName} {next.id === EXPLANATION.next.place.id ? EXPLANATION.next.walk : ""}
+            {t("다음: {place} {walk}", { place: next.shortName, walk: next.id === EXPLANATION.next.place.id ? EXPLANATION.next.walk : "" })}
           </Button>
         ) : (
           <Button className="flex-1" onClick={() => router.push("/log")}>
-            나의 기록 보기
+            {t("나의 기록 보기")}
           </Button>
         )}
       </ScreenFooter>

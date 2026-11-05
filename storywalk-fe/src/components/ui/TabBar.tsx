@@ -3,21 +3,20 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LogIcon, MapIcon, NowIcon } from "@/components/icons";
-import { t, type MsgKey } from "@/i18n";
+import { useT, type MsgKey } from "@/i18n";
 import { cn } from "@/lib/cn";
-import { useUserStore } from "@/store/user";
 
 // Figma: WF/TabBar (탭=지금 | 흔적 지도 | 나의 기록), 높이 72, 상단 10 · 좌우 40
 // 경로는 아직 화면이 없어 가정한 값이다. 라우트가 정해지면 여기만 바꾼다.
 const TABS: { href: string; label: MsgKey; Icon: typeof NowIcon }[] = [
-  { href: "/", label: "now", Icon: NowIcon },
-  { href: "/map", label: "map", Icon: MapIcon },
-  { href: "/log", label: "myLog", Icon: LogIcon },
+  { href: "/", label: "지금", Icon: NowIcon },
+  { href: "/map", label: "흔적 지도", Icon: MapIcon },
+  { href: "/log", label: "나의 기록", Icon: LogIcon },
 ];
 
 export function TabBar({ className }: { className?: string }) {
   const pathname = usePathname();
-  const language = useUserStore((s) => s.language);
+  const t = useT();
 
   return (
     <nav
@@ -39,7 +38,7 @@ export function TabBar({ className }: { className?: string }) {
             )}
           >
             <Icon />
-            {t(language, label)}
+            {t(label)}
           </Link>
         );
       })}

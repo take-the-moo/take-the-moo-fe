@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button, Chip, ChipGroup, InfoBox, Screen, ScreenBody, ScreenFooter, SectionTitle, TopBar } from "@/components/ui";
+import { useT } from "@/i18n";
 import { PREFERENCE_OPTIONS } from "@/mocks/sample";
 import { useUserStore } from "@/store/user";
 
@@ -20,6 +21,7 @@ function toggle(list: string[], value: string) {
 
 export default function PreferencesPage() {
   const router = useRouter();
+  const t = useT();
   const saved = useUserStore((s) => s.preferences);
   const setPreferences = useUserStore((s) => s.setPreferences);
   const [places, setPlaces] = useState<string[]>(saved?.places ?? DEFAULT.places);
@@ -35,38 +37,34 @@ export default function PreferencesPage() {
 
   return (
     <Screen>
-      <TopBar title="어떤 걸 좋아해요?" />
+      <TopBar title={t("어떤 걸 좋아해요?")} />
       <ScreenBody>
-        <InfoBox>
-          고른 취향은 추천에 먼저 반영돼요.
-          <br />
-          나중에 언제든 바꿀 수 있어요.
-        </InfoBox>
+        <InfoBox className="whitespace-pre-line">{t("고른 취향은 추천에 먼저 반영돼요.\n나중에 언제든 바꿀 수 있어요.")}</InfoBox>
 
-        <SectionTitle>가고 싶은 곳 (여러 개 선택)</SectionTitle>
+        <SectionTitle>{t("가고 싶은 곳 (여러 개 선택)")}</SectionTitle>
         <ChipGroup>
           {PREFERENCE_OPTIONS.places.map((p) => (
             <Chip key={p} selected={places.includes(p)} onClick={() => setPlaces((l) => toggle(l, p))}>
-              {p}
+              {t(p)}
             </Chip>
           ))}
         </ChipGroup>
 
-        <SectionTitle>관심 있는 이야기</SectionTitle>
+        <SectionTitle>{t("관심 있는 이야기")}</SectionTitle>
         <ChipGroup>
           {PREFERENCE_OPTIONS.stories.map((s) => (
             <Chip key={s} selected={stories.includes(s)} onClick={() => setStories((l) => toggle(l, s))}>
-              {s}
+              {t(s)}
             </Chip>
           ))}
         </ChipGroup>
 
-        <SectionTitle>여행 성향</SectionTitle>
+        <SectionTitle>{t("여행 성향")}</SectionTitle>
         {PREFERENCE_OPTIONS.styles.map((axis) => (
           <ChipGroup key={axis.join()}>
             {axis.map((s) => (
               <Chip key={s} selected={styles.includes(s)} onClick={() => pickStyle(axis, s)}>
-                {s}
+                {t(s)}
               </Chip>
             ))}
           </ChipGroup>
@@ -80,10 +78,10 @@ export default function PreferencesPage() {
             router.push("/setup");
           }}
         >
-          완료
+          {t("완료")}
         </Button>
         <Button variant="text" onClick={() => router.push("/setup")}>
-          건너뛰기
+          {t("건너뛰기")}
         </Button>
       </ScreenFooter>
     </Screen>

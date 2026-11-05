@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button, CheckCircle, Chip, ChipGroup, ImagePlaceholder, Screen, ScreenBody, ScreenFooter, SectionTitle, TopBar } from "@/components/ui";
+import { useT } from "@/i18n";
 import { POSTCARD, POSTCARD_STYLES } from "@/mocks/sample";
 import { takePhoto } from "@/platform/camera";
 import { useCaptureStore } from "@/store/capture";
@@ -16,6 +17,7 @@ const SLOTS = 4;
 
 export default function PostcardPage() {
   const router = useRouter();
+  const t = useT();
   const photos = useCaptureStore((s) => s.photos);
   const addPhoto = useCaptureStore((s) => s.add);
   const startJob = usePostcardStore((s) => s.start);
@@ -38,10 +40,10 @@ export default function PostcardPage() {
 
   return (
     <Screen>
-      <TopBar title="회고 엽서 만들기" />
+      <TopBar title={t("회고 엽서 만들기")} />
       <ScreenBody>
         <div className="flex items-center justify-between leading-[1.45]">
-          <SectionTitle>사진 4장 고르기</SectionTitle>
+          <SectionTitle>{t("사진 4장 고르기")}</SectionTitle>
           <span className="text-label font-medium text-fg-caption">
             {selectedCount} / {SLOTS}
           </span>
@@ -54,11 +56,11 @@ export default function PostcardPage() {
                 <button
                   type="button"
                   aria-pressed={selected}
-                  aria-label={`사진${i + 1} ${selected ? "선택됨" : "선택 안 됨"}`}
+                  aria-label={`${t("사진{n}", { n: i + 1 })} ${selected ? t("선택됨") : t("선택 안 됨")}`}
                   onClick={() => toggle(i)}
                   className={cn("relative block size-[81px]", !selected && "opacity-50")}
                 >
-                  <ImagePlaceholder label={`사진${i + 1}`} src={photo?.url} className="size-[81px]" />
+                  <ImagePlaceholder label={t("사진{n}", { n: i + 1 })} src={photo?.url} className="size-[81px]" />
                   {selected && <CheckCircle size={20} className="absolute top-1 right-1" />}
                 </button>
               </li>
@@ -66,11 +68,11 @@ export default function PostcardPage() {
           })}
         </ul>
         <button type="button" onClick={addMore} className="self-start text-caption font-medium text-fg-caption">
-          + 오늘 찍은 사진 {Math.max(POSTCARD.todayPhotoCount, photos.length)}장 중에서 선택
+          {t("+ 오늘 찍은 사진 {count}장 중에서 선택", { count: Math.max(POSTCARD.todayPhotoCount, photos.length) })}
         </button>
 
         <SectionTitle>
-          <label htmlFor="postcard-note">오늘 어땠어요?</label>
+          <label htmlFor="postcard-note">{t("오늘 어땠어요?")}</label>
         </SectionTitle>
         <div className="flex min-h-24 flex-col gap-1.5 rounded-control border border-line p-4 leading-[1.45] focus-within:border-fg">
           <textarea
@@ -78,25 +80,25 @@ export default function PostcardPage() {
             rows={2}
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="오늘 느낀 걸 내 언어로 적어 보세요"
+            placeholder={t("오늘 느낀 걸 내 언어로 적어 보세요")}
             className="w-full resize-none bg-transparent text-body text-ink outline-none placeholder:text-fg-muted"
           />
           {/* 번역은 생성 API가 해준다. 샘플 문장일 때만 샘플 번역을 보여준다. */}
           {note === POSTCARD.note && <p className="text-caption text-fg-muted">→ {POSTCARD.noteKorean}</p>}
         </div>
 
-        <SectionTitle>그림체</SectionTitle>
+        <SectionTitle>{t("그림체")}</SectionTitle>
         <ChipGroup>
           {POSTCARD_STYLES.map((s) => (
             <Chip key={s} selected={style === s} onClick={() => setStyle(s)}>
-              {s}
+              {t(s)}
             </Chip>
           ))}
         </ChipGroup>
       </ScreenBody>
       <ScreenFooter>
         <p className="text-center text-caption leading-[1.45] text-fg-muted">
-          만드는 데 {POSTCARD.expectedSeconds}초쯤 걸려요 · 다른 화면에 가 있어도 돼요
+          {t("만드는 데 {seconds}초쯤 걸려요 · 다른 화면에 가 있어도 돼요", { seconds: POSTCARD.expectedSeconds })}
         </p>
         <Button
           disabled={selectedCount !== SLOTS || !note.trim()}
@@ -105,7 +107,7 @@ export default function PostcardPage() {
             router.push("/postcard/result");
           }}
         >
-          엽서 만들기
+          {t("엽서 만들기")}
         </Button>
       </ScreenFooter>
     </Screen>

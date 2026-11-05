@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button, CheckCircle, ImagePlaceholder, Screen, ScreenBody, ScreenFooter, TopBar } from "@/components/ui";
+import { useT, type MsgKey } from "@/i18n";
 import { POSTCARD } from "@/mocks/sample";
 import { sharePostcard } from "@/platform/share";
 import { usePostcardStore } from "@/store/postcard";
@@ -14,6 +15,7 @@ const SAMPLE_DURATION_MS = 4000;
 
 export default function PostcardResultPage() {
   const router = useRouter();
+  const t = useT();
   const job = usePostcardStore((s) => s.job);
   const finish = usePostcardStore((s) => s.finish);
   const [now, setNow] = useState(() => Date.now());
@@ -24,9 +26,9 @@ export default function PostcardResultPage() {
   useEffect(() => {
     if (!job || job.status !== "generating") return;
     const timer = setInterval(() => {
-      const t = Date.now();
-      setNow(t);
-      if (t - job.startedAt >= SAMPLE_DURATION_MS) finish();
+      const current = Date.now();
+      setNow(current);
+      if (current - job.startedAt >= SAMPLE_DURATION_MS) finish();
     }, 250);
     return () => clearInterval(timer);
   }, [job, finish]);
@@ -38,19 +40,19 @@ export default function PostcardResultPage() {
 
   const save = async () => {
     if (!POSTCARD.imageUrl) {
-      setSaveError("아직 저장할 엽서 이미지가 없어요 (생성 API 연동 전)");
+      setSaveError(t("아직 저장할 엽서 이미지가 없어요 (생성 API 연동 전)"));
       return;
     }
     try {
       await sharePostcard(POSTCARD.imageUrl);
     } catch {
-      setSaveError("이미지를 저장하지 못했어요. 다시 시도해 주세요.");
+      setSaveError(t("이미지를 저장하지 못했어요. 다시 시도해 주세요."));
     }
   };
 
   return (
     <Screen>
-      <TopBar title="나의 서대문 엽서" />
+      <TopBar title={t("나의 서대문 엽서")} />
       <ScreenBody>
         <div className="flex flex-col gap-2 rounded-control bg-surface-sunken px-3 py-2.5" role="status" aria-live="polite">
           <div className="flex items-center gap-2.5">
@@ -60,7 +62,7 @@ export default function PostcardResultPage() {
               <CheckCircle size={18} />
             )}
             <p className="text-caption leading-[1.45] font-medium text-fg-sub">
-              {generating ? `엽서를 만들고 있어요 · 약 ${POSTCARD.expectedSeconds}초 · 다른 화면에 가 있어도 돼요` : "완성됐어요"}
+              {generating ? t("엽서를 만들고 있어요 · 약 {seconds}초 · 다른 화면에 가 있어도 돼요", { seconds: POSTCARD.expectedSeconds }) : t("완성됐어요")}
             </p>
           </div>
           {generating && (
@@ -73,7 +75,7 @@ export default function PostcardResultPage() {
         <article className="flex flex-col gap-3 rounded-box border-2 border-primary bg-surface p-3">
           <ImagePlaceholder
             src={generating ? null : POSTCARD.imageUrl}
-            label={generating ? "엽서를 그리는 중…" : `AI 생성 엽서 (사진 ${job?.photoCount ?? 4}장 + 소감 + ${style})`}
+            label={generating ? t("엽서를 그리는 중…") : t("AI 생성 엽서 (사진 {count}장 + 소감 + {style})", { count: job?.photoCount ?? 4, style: t(style as MsgKey) })}
             className="h-[300px]"
           />
           <div className="flex flex-col gap-1 px-1 leading-[1.45]">
@@ -91,10 +93,10 @@ export default function PostcardResultPage() {
       <ScreenFooter className="flex-row!">
         {/* 트리거 17: 흔적 지도에 공유 → 07 / 트리거 18: 이미지 저장 */}
         <Button variant="secondary" className="flex-1" disabled={generating} onClick={() => router.push("/map")}>
-          흔적 지도에 공유
+          {t("흔적 지도에 공유")}
         </Button>
         <Button className="flex-1" disabled={generating} onClick={save}>
-          이미지 저장
+          {t("이미지 저장")}
         </Button>
       </ScreenFooter>
     </Screen>

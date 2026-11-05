@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { t, useLang, useT } from "@/i18n";
 import { loadNaverMaps, toLatLng, type LngLat } from "@/platform/map";
 import { cn } from "@/lib/cn";
 
@@ -27,6 +28,7 @@ const pinHtml = (pin: TracePin, selected: boolean) => {
 export function TraceMap({ pins, selectedId, onSelect, className }: Props) {
   const el = useRef<HTMLDivElement>(null);
   const mapRef = useRef<naver.maps.Map | null>(null);
+  const lang = useLang();
   const [mode, setMode] = useState<"loading" | "map" | "fallback">("loading");
   const onSelectRef = useRef(onSelect);
   useEffect(() => {
@@ -79,7 +81,7 @@ export function TraceMap({ pins, selectedId, onSelect, className }: Props) {
       const marker = new naver.maps.Marker({
         map,
         position: toLatLng(pin.at),
-        title: `${pin.label} · ${pin.count}명`,
+        title: t(lang, "{place} · {count}명", { place: pin.label, count: pin.count }),
         icon: { content: pinHtml(pin, pin.id === selectedId), anchor: new naver.maps.Point(half, half) },
         zIndex: pin.id === selectedId ? 10 : 1,
       });
@@ -91,7 +93,7 @@ export function TraceMap({ pins, selectedId, onSelect, className }: Props) {
         naver.maps.Event.clearInstanceListeners(m);
         m.setMap(null);
       });
-  }, [mode, pins, selectedId]);
+  }, [mode, pins, selectedId, lang]);
 
   return (
     <div className={cn("relative h-[220px] w-full overflow-hidden rounded-box bg-surface-sunken", className)}>
@@ -105,6 +107,7 @@ export function TraceMap({ pins, selectedId, onSelect, className }: Props) {
 // 지도 SDK 없이 그리는 개략도. 실제 거리 비례로 놓으면 가까운 장소(형무소역사관·독립문)가 겹쳐서,
 // 경도·위도의 '순위'로 배치한다. 동서·남북 방향 관계만 유지하고 간격은 고르게 편다.
 function Schematic({ pins, selectedId, onSelect }: Omit<Props, "className">) {
+  const tr = useT();
   const rank = (values: number[], v: number) => {
     const sorted = [...new Set(values)].sort((a, b) => a - b);
     return sorted.length > 1 ? sorted.indexOf(v) / (sorted.length - 1) : 0.5;
@@ -115,7 +118,7 @@ function Schematic({ pins, selectedId, onSelect }: Omit<Props, "className">) {
   const y = (lat: number) => 20 + (1 - rank(lats, lat)) * 58; // 북쪽이 위. 아래는 이름표 자리만큼 더 비운다
 
   return (
-    <div className="absolute inset-0" aria-label="장소별 방문 수 개략도">
+    <div className="absolute inset-0" aria-label={tr("장소별 방문 수 개략도")}>
       {/* 길 표시 (장식) */}
       <div aria-hidden className="absolute top-[30%] -left-5 h-2.5 w-[115%] -rotate-12 bg-surface" />
       <div aria-hidden className="absolute -top-5 left-[54%] h-[120%] w-2.5 bg-surface" />
@@ -127,7 +130,7 @@ function Schematic({ pins, selectedId, onSelect }: Omit<Props, "className">) {
             type="button"
             onClick={() => onSelect(pin.id)}
             aria-pressed={selected}
-            aria-label={`${pin.label} 방문 ${pin.count}명`}
+            aria-label={tr("{place} 방문 {count}명", { place: pin.label, count: pin.count })}
             style={{ left: `${x(pin.at[0])}%`, top: `${y(pin.at[1])}%` }}
             className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-0.5"
           >

@@ -16,6 +16,7 @@ import {
   TabBar,
 } from "@/components/ui";
 import { useAskWithPhoto } from "@/hooks/useAskWithPhoto";
+import { useT } from "@/i18n";
 import { NOW } from "@/mocks/sample";
 import { useUserHydrated, useUserStore } from "@/store/user";
 
@@ -23,6 +24,7 @@ import { useUserHydrated, useUserStore } from "@/store/user";
 // 추천 내용은 GET /now 연동 전까지 샘플 데이터다. 진입 시 위치 1회 조회도 /now 연동과 함께 붙인다.
 export default function NowPage() {
   const router = useRouter();
+  const t = useT();
   const hydrated = useUserHydrated();
   const userId = useUserStore((s) => s.userId);
   const { ask, busy } = useAskWithPhoto();
@@ -39,16 +41,16 @@ export default function NowPage() {
   return (
     <Screen>
       <ScreenBody>
-        <ScreenHeading title={`지금, ${NOW.area} 근처`} sub={NOW.summary} />
+        <ScreenHeading title={t("지금, {area} 근처", { area: NOW.area })} sub={NOW.summary} />
         <ChipGroup>
           {NOW.context.map((c) => (
             <Chip key={c}>{c}</Chip>
           ))}
         </ChipGroup>
 
-        <SectionTitle>지금 가기 좋은 곳</SectionTitle>
+        <SectionTitle>{t("지금 가기 좋은 곳")}</SectionTitle>
         <Card>
-          <ImagePlaceholder label="장소 사진 (TourAPI)" className="h-[104px]" />
+          <ImagePlaceholder label={t("장소 사진 (TourAPI)")} className="h-[104px]" />
           <p className="text-[18px] font-bold leading-[1.45] text-fg">{rec.place.name}</p>
           <p className="text-label leading-[1.45] text-fg-caption">{rec.reason}</p>
           <ChipGroup>
@@ -57,10 +59,10 @@ export default function NowPage() {
             ))}
           </ChipGroup>
           {/* 트리거 6: 장면 보기 → 04 */}
-          <Button onClick={() => router.push(`/scene/${rec.place.id}`)}>장면 보기</Button>
+          <Button onClick={() => router.push(`/scene/${rec.place.id}`)}>{t("장면 보기")}</Button>
         </Card>
 
-        <SectionTitle>지난주 유학생 인기</SectionTitle>
+        <SectionTitle>{t("지난주 유학생 인기")}</SectionTitle>
         <div className="flex gap-2.5">
           {NOW.popular.map(({ place, count }) => (
             // 인기 장소 카드도 04로 연결된다 (v3.1 피드백)
@@ -68,7 +70,7 @@ export default function NowPage() {
               <Card className="gap-1.5! p-2.5!">
                 <ImagePlaceholder className="h-[52px]" />
                 <p className="text-body font-bold leading-[1.45] text-fg">{place.name}</p>
-                <p className="text-caption leading-[1.45] text-fg-muted">유학생 {count}명</p>
+                <p className="text-caption leading-[1.45] text-fg-muted">{t("유학생 {count}명", { count })}</p>
               </Card>
             </Link>
           ))}
@@ -78,7 +80,7 @@ export default function NowPage() {
       <div className="px-5 py-2">
         {/* 바로가기: 카메라로 묻기 → 05 */}
         <Button variant="secondary" onClick={ask} disabled={busy}>
-          지금 보이는 걸 찍어서 물어보기
+          {t("지금 보이는 걸 찍어서 물어보기")}
         </Button>
       </div>
       <TabBar />

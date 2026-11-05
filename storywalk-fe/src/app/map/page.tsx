@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { TraceMap, type TracePin } from "@/components/map/TraceMap";
 import { Chip, ChipGroup, PeekSheet, Screen, ScreenBody, ScreenHeading, SectionTitle, TabBar } from "@/components/ui";
+import { useT, type MsgKey } from "@/i18n";
 import { FOOTSTEPS, MAP_FILTERS, MAP_PINS, PLACE_STATS } from "@/mocks/sample";
 import { cn } from "@/lib/cn";
 
@@ -17,6 +18,7 @@ const MAP_MIN_HEIGHT = 220;
 const PINS: TracePin[] = MAP_PINS.map(({ place, count }) => ({ id: place.id, label: place.shortName, count, at: place.at }));
 
 export default function MapPage() {
+  const t = useT();
   const [nationality, setNationality] = useState<string>("베트남");
   const [thisWeek, setThisWeek] = useState(false);
   const [selectedId, setSelectedId] = useState(PLACE_STATS.place.id);
@@ -30,15 +32,15 @@ export default function MapPage() {
     // 지도가 남은 높이를 채우도록 화면을 뷰포트에 고정한다. 긴 내용은 시트 안에서만 스크롤한다.
     <Screen className="h-[calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom))]">
       <ScreenBody className="flex-none! gap-3!">
-        <ScreenHeading title="흔적 지도" />
+        <ScreenHeading title={t("흔적 지도")} />
         <ChipGroup>
           {MAP_FILTERS.map((f) => (
             <Chip key={f} selected={nationality === f} onClick={() => setNationality(f)}>
-              {f}
+              {t(f)}
             </Chip>
           ))}
           <Chip selected={thisWeek} onClick={() => setThisWeek((v) => !v)}>
-            이번 주
+            {t("이번 주")}
           </Chip>
         </ChipGroup>
       </ScreenBody>
@@ -48,13 +50,13 @@ export default function MapPage() {
         <TraceMap pins={PINS} selectedId={selectedId} onSelect={setSelectedId} className="isolate h-auto! min-h-0 flex-1 rounded-none!" />
         <PeekSheet
           keep={MAP_MIN_HEIGHT}
-          title={`${selectedPin?.place.name} · 다녀간 유학생 ${stats ? stats.total : selectedPin?.count}명`}
+          title={t("{place} · 다녀간 유학생 {count}명", { place: selectedPin?.place.name ?? "", count: (stats ? stats.total : selectedPin?.count) ?? 0 })}
         >
           {stats && (
             <div className="flex flex-col gap-1.5">
               {stats.byNationality.map((n, i) => (
                 <div key={n.label} className="flex items-center gap-2 text-micro leading-[1.45]">
-                  <span className="w-11 shrink-0 font-medium text-fg-caption">{n.label}</span>
+                  <span className="w-11 shrink-0 font-medium text-fg-caption">{t(n.label as MsgKey)}</span>
                   <span className="flex h-2 flex-1 items-center">
                     <span
                       className={cn("h-2 rounded-[4px]", i === 0 ? "bg-ink" : "bg-fg-disabled")}
@@ -67,14 +69,14 @@ export default function MapPage() {
             </div>
           )}
 
-          <SectionTitle>한걸음</SectionTitle>
+          <SectionTitle>{t("한걸음")}</SectionTitle>
           <ul className="flex flex-col gap-3">
             {FOOTSTEPS.map((f) => (
               <li key={f.id} className="flex gap-2.5">
                 <span aria-hidden className="size-8 shrink-0 rounded-full bg-line" />
                 <div className="flex min-w-0 flex-1 flex-col gap-0.5 leading-[1.45]">
                   <p className="text-micro font-medium text-fg-muted">
-                    {f.nationality} · {f.date}
+                    {t(f.nationality as MsgKey)} · {f.date}
                   </p>
                   <p className="text-label text-fg">{f.text}</p>
                 </div>

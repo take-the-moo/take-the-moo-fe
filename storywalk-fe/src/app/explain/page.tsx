@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button, ImagePlaceholder, OptionRow, Screen, ScreenBody, ScreenFooter, TextField, TopBar } from "@/components/ui";
+import { useT } from "@/i18n";
 import { NEARBY, PLACES, type Place } from "@/mocks/sample";
 import { takePhoto } from "@/platform/camera";
 import { useCaptureStore, useLatestPhoto } from "@/store/capture";
@@ -14,6 +15,7 @@ const SEARCH = "search";
 
 export default function ExplainPage() {
   const router = useRouter();
+  const t = useT();
   const photo = useLatestPhoto();
   const addPhoto = useCaptureStore((s) => s.add);
   const [selected, setSelected] = useState<string>(NEARBY[0].place.id);
@@ -35,15 +37,15 @@ export default function ExplainPage() {
 
   return (
     <Screen>
-      <TopBar title="현장 해설" />
+      <TopBar title={t("현장 해설")} />
       <ScreenBody className="gap-2.5!">
-        <button type="button" onClick={retake} aria-label={photo ? "사진 다시 찍기" : "사진 찍기"} className="w-full">
-          <ImagePlaceholder label={photo ? "방금 찍은 사진" : "눌러서 사진 찍기"} src={photo?.url} className="h-[230px]" />
+        <button type="button" onClick={retake} aria-label={photo ? t("사진 다시 찍기") : t("사진 찍기")} className="w-full">
+          <ImagePlaceholder label={photo ? t("방금 찍은 사진") : t("눌러서 사진 찍기")} src={photo?.url} className="h-[230px]" />
         </button>
-        <h2 className="text-headline leading-[1.45] font-bold text-fg">이 사진은 어디인가요?</h2>
-        <p className="text-caption leading-[1.45] text-fg-muted">근처 장소 중에서 골라주세요 · 위치는 저장하지 않아요</p>
+        <h2 className="text-headline leading-[1.45] font-bold text-fg">{t("이 사진은 어디인가요?")}</h2>
+        <p className="text-caption leading-[1.45] text-fg-muted">{t("근처 장소 중에서 골라주세요 · 위치는 저장하지 않아요")}</p>
 
-        <div role="radiogroup" aria-label="사진 속 장소" className="flex flex-col gap-2.5">
+        <div role="radiogroup" aria-label={t("사진 속 장소")} className="flex flex-col gap-2.5">
           {NEARBY.map(({ place, spot, distance }) => (
             <OptionRow
               key={place.id}
@@ -54,8 +56,8 @@ export default function ExplainPage() {
             />
           ))}
           <OptionRow
-            title={picked ? picked.name : "여기 없어요"}
-            sub={picked ? "직접 검색해서 골랐어요" : "직접 검색하기"}
+            title={picked ? picked.name : t("여기 없어요")}
+            sub={picked ? t("직접 검색해서 골랐어요") : t("직접 검색하기")}
             selected={selected === SEARCH}
             onSelect={() => setSelected(SEARCH)}
           />
@@ -65,10 +67,10 @@ export default function ExplainPage() {
           <div className="flex flex-col gap-2">
             <TextField
               type="search"
-              placeholder="장소 이름으로 검색"
+              placeholder={t("장소 이름으로 검색")}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              aria-label="장소 검색"
+              aria-label={t("장소 검색")}
             />
             {results.map((p) => (
               <button
@@ -84,7 +86,7 @@ export default function ExplainPage() {
               </button>
             ))}
             {query.trim() && results.length === 0 && (
-              <p className="px-1 text-caption text-fg-muted">검색 결과가 없어요</p>
+              <p className="px-1 text-caption text-fg-muted">{t("검색 결과가 없어요")}</p>
             )}
           </div>
         )}
@@ -92,7 +94,7 @@ export default function ExplainPage() {
       <ScreenFooter>
         {/* 트리거 10: 해설 보기 → 06 */}
         <Button disabled={!targetId} onClick={() => router.push(`/visit/${targetId}?mode=explain`)}>
-          해설 보기
+          {t("해설 보기")}
         </Button>
       </ScreenFooter>
     </Screen>

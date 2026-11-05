@@ -50,7 +50,7 @@ Figma ui_ref(사용자 플로우 v3.1)의 13개 화면을 **화면 단위로 구
 | F6 | `GET /map/pins`·`GET /places/{id}/reviews` 연동. 한걸음 저장 요청 필드명 확정 |
 | F7 | `POST /postcards`·`GET /postcards/{id}` 연동. 결과 이미지가 없어 "이미지 저장"은 안내만 표시 |
 
-`motion`은 설치되어 있지만 사용 코드가 없다. React Query는 Provider만 구성되어 있고 `useQuery`·`useMutation` 기반 기능은 아직 없다. UI 번역 사전은 탭 라벨에만 쓰이며, 화면 문구는 Figma대로 한국어로 둔 상태다.
+`motion`은 `PeekSheet`에서 쓴다. React Query는 Provider만 구성되어 있고 `useQuery`·`useMutation` 기반 기능은 아직 없다. 화면 문구는 UI 번역 사전을 거치며, `src/mocks/sample.ts`의 샘플 콘텐츠(장소 이름·추천 문구·해설 등)는 API 연동 전까지 한국어 그대로다.
 
 ## 4. 기술 구성
 
@@ -113,9 +113,9 @@ JSON 요청에는 기본 `Content-Type: application/json`을 넣고, `FormData`�
 | 화면 일시 상태 | 페이지의 React state·ref | 검증 로그, SDK 준비 상태 등 |
 | 사용자 상태 | `src/store/user.ts` | `userId`, `nationality`, `language`를 `storywalk-user` 키로 localStorage에 유지. `setUser`, `reset` 제공 |
 | 서버 상태 | `src/app/providers.tsx` | QueryClient 기반만 있음. 영속 캐시는 설정되지 않음 |
-| UI 번역 | `src/i18n/index.ts` | 한국어·베트남어·중국어·몽골어·영어·일본어의 4개 고정 문구. 선택한 언어로 탭 라벨 표시. 미지원 언어는 한국어로 대체 |
+| UI 번역 | `src/i18n/messages.ts`, `src/i18n/index.ts` | 한국어 원문을 키로 쓰는 5개 언어 고정 사전. `useT()`로 표시. 언어 선택 전에는 기기 언어, 미지원 기기 언어는 영어로 표시 |
 
-장소 이야기·해설·후기 번역은 요구서상 백엔드 책임이다. 클라이언트 번역 사전에 생성 콘텐츠를 저장하는 구조가 아니다. UI 사전은 언어 설정에서 선택 가능한 5개 언어와 한국어를 지원하며 LLM을 호출하지 않는다. 생성 콘텐츠의 지원 언어 범위와 두 번째 시연 국적은 추가 합의가 필요하다.
+장소 이야기·해설·후기 번역은 요구서상 백엔드 책임이다. 클라이언트 번역 사전에 생성 콘텐츠를 저장하는 구조가 아니다. UI 사전은 언어 설정에서 선택 가능한 5개 언어와 한국어를 지원한다. 번역은 LLM으로 미리 생성해 저장소에 두고, 앱 실행 중에는 LLM을 호출하지 않는다. 시연 언어의 번역문은 사람이 검수한다. 생성 콘텐츠의 지원 언어 범위와 두 번째 시연 국적은 추가 합의가 필요하다.
 
 ### 플랫폼 어댑터
 
