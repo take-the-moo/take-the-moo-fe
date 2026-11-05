@@ -3,7 +3,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { use, useMemo, useState } from "react";
 import { reviewsApi } from "@/api/reviews";
-import type { MapPin } from "@/api/types";
+import type { MapPin, VisitHistory } from "@/api/types";
+import { visitsApi } from "@/api/visits";
 import { PostcardFlyIn } from "@/components/map/PostcardFlyIn";
 import { TraceMap, type TracePin } from "@/components/map/TraceMap";
 import { Card, Chip, PeekSheet, Screen, SectionTitle, TabBar, WalkingLoader } from "@/components/ui";
@@ -18,6 +19,7 @@ import { cn } from "@/lib/cn";
 // 07 흔적 지도 · F6 — Figma 9:1396(시트 올림), 9:1450(시트 내림)
 // 장소별 방문 수·국적 분포는 GET /map/pins, 한걸음은 GET /places/{id}/reviews(보는 사람 언어로 번역)다.
 // 국적 필터는 핀의 국적 분포로 화면에서 거른다. '이번 주'는 서버가 기간별 집계를 주지 않아 아직 숫자에 반영되지 않는다.
+// 내 경로(찍은 도장·코스 정류장)는 GET /users/{id}/visits로 받아, 방문자가 없거나 필터에서 빠지는 곳도 핀으로 남긴다.
 // ?placeId=로 들어오면(한걸음 저장 직후) 그 장소를 선택한다.
 // 국적 분포 막대: 가장 큰 값이 트랙의 80%를 차지한다 (Figma 막대 비율)
 const BAR_MAX = 80;
@@ -30,15 +32,19 @@ type Props = { searchParams: Promise<{ placeId?: string }> };
 
 const filterCode = (label: string) => NATIONALITIES.find((n) => n.label === label)?.code ?? null;
 
-function toPins(pins: MapPin[], code: string | null): TracePin[] {
+// 도장을 찍은 곳과 내 코스의 정류장
+const routePlaceIds = (history?: VisitHistory) =>
+  new Set([...(history?.stamps ?? []), ...(history?.courses.flatMap((c) => c.stops) ?? [])].map((p) => String(p.placeId)));
+
+function toPins(pins: MapPin[], code: string | null, route: Set<string>): TracePin[] {
   const counted = pins.map((p) => ({
     id: String(p.placeId),
     label: p.name,
     count: code ? (p.nationalities.find((n) => n.nationality === code)?.count ?? 0) : p.visitorCount,
     at: [p.longitude, p.latitude] as [number, number],
   }));
-  const visited = counted.filter((p) => p.count > 0);
-  return visited.length > 0 ? visited : counted.slice(0, EMPTY_PIN_COUNT);
+  const shown = counted.filter((p) => p.count > 0 || route.has(p.id));
+  return shown.length > 0 ? shown : counted.slice(0, EMPTY_PIN_COUNT);
 }
 
 export default function MapPage({ searchParams }: Props) {
@@ -52,7 +58,16 @@ export default function MapPage({ searchParams }: Props) {
   const [thisWeek, setThisWeek] = useState(false);
   const [selected, setSelected] = useState<string | null>(initialId ?? null);
 
-  const pins = useMemo(() => toPins(places.data ?? [], filterCode(nationality)), [places.data, nationality]);
+  const history = useQuery({
+    queryKey: ["visits", userId],
+    queryFn: ({ signal }) => visitsApi.getHistory(userId!, signal),
+    enabled: Boolean(userId),
+  });
+
+  const pins = useMemo(
+    () => toPins(places.data ?? [], filterCode(nationality), routePlaceIds(history.data)),
+    [places.data, nationality, history.data],
+  );
   const selectedId = selected ?? pins[0]?.id ?? null;
   const selectedPlace = places.data?.find((p) => String(p.placeId) === selectedId);
 
@@ -75,8 +90,8 @@ export default function MapPage({ searchParams }: Props) {
       </header>
 
       <div className="flex min-h-0 flex-1 flex-col bg-surface-sunken">
-        {/* isolate: 지도 SDK 내부 z-index가 밖으로 새지 않게 가둔다. 지도는 핀으로 처음 영역을 정해서 핀을 받은 뒤 그린다 */}
-        {pins.length > 0 && selectedId ? (
+        {/* isolate: 지도 SDK 내부 z-index가 밖으로 새지 않게 가둔다. 지도는 핀으로 처음 영역을 정해서 내 경로까지 받은 뒤 그린다 */}
+        {pins.length > 0 && selectedId && !history.isLoading ? (
           <TraceMap pins={pins} selectedId={selectedId} onSelect={setSelected} className="isolate h-auto! min-h-0 flex-1 rounded-none!" />
         ) : (
           <p className="flex flex-1 items-center justify-center text-caption text-fg-muted">
