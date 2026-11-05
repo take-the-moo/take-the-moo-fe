@@ -6,6 +6,12 @@ const API_PROXY_TARGET = process.env.API_PROXY_TARGET ?? "http://localhost:8080"
 
 const nextConfig: NextConfig = {
   devIndicators: false, // 시연 화면에 Next 개발 표시가 뜨지 않게
+  // Tailwind v4를 Turbopack 로더로 처리한다 (@tailwindcss/turbopack). 이 규칙이 없으면 유틸리티 클래스가 생성되지 않는다.
+  turbopack: {
+    rules: {
+      "*.css": { loaders: ["@tailwindcss/turbopack"], as: "*.css" },
+    },
+  },
   async rewrites() {
     return [{ source: "/api/:path*", destination: `${API_PROXY_TARGET}/api/:path*` }];
   },
