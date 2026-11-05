@@ -19,7 +19,11 @@ const isReady = () => typeof window !== "undefined" && Boolean(
   window.naver?.maps?.Map && window.naver?.maps?.LatLng && window.naver?.maps?.Panorama,
 );
 
-export function loadNaverMaps(): Promise<void> {
+// 바탕 지도가 지원하는 언어. 베트남어·몽골어 등은 영어로 보여준다.
+const MAP_LANGUAGES: readonly string[] = ["ko", "en", "zh", "ja"];
+
+// 언어는 SDK를 처음 불러올 때만 정해진다. 이후 언어를 바꾸면 새로고침해야 바탕 지도에 반영된다.
+export function loadNaverMaps(lang?: string | null): Promise<void> {
   if (typeof window === "undefined") return Promise.reject(new Error("브라우저에서만 로드 가능"));
   if (!KEY_ID) return Promise.reject(new Error(".env.local의 NEXT_PUBLIC_NAVER_MAP_KEY_ID(Maps Client ID) 설정 후 dev 서버 재시작"));
   if (isReady()) return Promise.resolve();
@@ -45,7 +49,8 @@ export function loadNaverMaps(): Promise<void> {
       resolve();
     };
     const s = document.createElement("script");
-    s.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${KEY_ID}&submodules=panorama&callback=__naverMapsReady`;
+    const language = !lang ? "ko" : MAP_LANGUAGES.includes(lang) ? lang : "en";
+    s.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${KEY_ID}&language=${language}&submodules=panorama&callback=__naverMapsReady`;
     s.async = true;
     s.onerror = () => {
       window.__naverMapsLoading = undefined;

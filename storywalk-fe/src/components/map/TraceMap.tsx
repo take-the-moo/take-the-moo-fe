@@ -43,7 +43,7 @@ export function TraceMap({ pins, selectedId, onSelect, className }: Props) {
       setMode("fallback");
     };
     window.addEventListener("naver-maps-auth-failure", onAuthFailure);
-    loadNaverMaps()
+    loadNaverMaps(lang)
       .then(() => {
         if (cancelled || !el.current) return;
         const bounds = new naver.maps.LatLngBounds(toLatLng(pins[0].at), toLatLng(pins[0].at));

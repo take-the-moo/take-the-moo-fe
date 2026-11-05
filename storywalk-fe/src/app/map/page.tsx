@@ -19,7 +19,7 @@ import { cn } from "@/lib/cn";
 // 07 흔적 지도 · F6 — Figma 9:1396(시트 올림), 9:1450(시트 내림)
 // 장소별 방문 수·국적 분포는 GET /map/pins, 한걸음은 GET /places/{id}/reviews(보는 사람 언어로 번역)다.
 // 국적 필터는 핀의 국적 분포로 화면에서 거른다. '이번 주'는 서버가 기간별 집계를 주지 않아 아직 숫자에 반영되지 않는다.
-// 내 경로(찍은 도장·코스 정류장)는 GET /users/{id}/visits로 받아, 방문자가 없거나 필터에서 빠지는 곳도 핀으로 남긴다.
+// 내 경로(찍은 도장)는 GET /users/{id}/visits로 받아, 국적 필터에서 빠지는 곳도 핀으로 남긴다.
 // ?placeId=로 들어오면(한걸음 저장 직후) 그 장소를 선택한다.
 // 국적 분포 막대: 가장 큰 값이 트랙의 80%를 차지한다 (Figma 막대 비율)
 const BAR_MAX = 80;
@@ -32,9 +32,8 @@ type Props = { searchParams: Promise<{ placeId?: string }> };
 
 const filterCode = (label: string) => NATIONALITIES.find((n) => n.label === label)?.code ?? null;
 
-// 도장을 찍은 곳과 내 코스의 정류장
-const routePlaceIds = (history?: VisitHistory) =>
-  new Set([...(history?.stamps ?? []), ...(history?.courses.flatMap((c) => c.stops) ?? [])].map((p) => String(p.placeId)));
+// 내가 도장을 찍은 곳. history.courses는 안 가본 코스까지 다 주므로 쓰지 않는다
+const routePlaceIds = (history?: VisitHistory) => new Set(history?.stamps.map((s) => String(s.placeId)));
 
 function toPins(pins: MapPin[], code: string | null, route: Set<string>, lang: string | null): TracePin[] {
   const counted = pins.map((p) => ({
