@@ -1,5 +1,50 @@
 @import "tailwindcss";
 
+/*
+ * 디자인 토큰 (최소 세트)
+ * 출처: Figma ui_ref 와이어프레임의 WF/* 컴포넌트 실측값.
+ * 와이어프레임 단계라 회색 계열만 있다. 비주얼 디자인이 확정되면 이 값만 바꾼다.
+ * 1px 안팎으로 차이 나는 회색은 하나로 합쳤다 (예: #212121·#222 → fg, #f0f0f0 → surface-sunken).
+ */
+@theme {
+  /* 텍스트 */
+  --color-ink: #141414; /* 화면 대제목 */
+  --color-fg: #262626; /* 기본 본문·제목 */
+  --color-fg-sub: #4d4d4d; /* 보조 설명, 기본 칩 */
+  --color-fg-muted: #808080; /* 캡션, 플레이스홀더 */
+  --color-fg-disabled: #999999; /* 비활성 탭 */
+
+  /* 면 */
+  --color-primary: #333333; /* 주 버튼, 선택 칩 */
+  --color-on-primary: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-sunken: #f2f2f2; /* 안내 박스, 기본 칩 */
+  --color-surface-placeholder: #e0e0e0; /* 이미지 자리 */
+
+  /* 선 */
+  --color-line-subtle: #e0e0e0; /* 탭바 상단 */
+  --color-line: #d9d9d9; /* 카드 테두리 */
+  --color-line-strong: #cccccc; /* 보조 버튼 테두리 */
+
+  /* 포인트 — Figma 변수 Point/Orange (값은 노란색) */
+  --color-point: #fcff5b;
+
+  /* 모서리 */
+  --radius-control: 12px; /* 버튼, 입력, 이미지 자리 */
+  --radius-box: 14px; /* 안내 박스, 카드 */
+  --radius-pill: 16px; /* 칩 */
+
+  /* 글자 크기 */
+  --text-display: 28px;
+  --text-title: 20px;
+  --text-headline: 17px; /* 상단 바 제목 */
+  --text-body-lg: 16px; /* 섹션 제목, 버튼 */
+  --text-body: 14px;
+  --text-label: 13px; /* 칩, 안내 박스 */
+  --text-caption: 12px;
+  --text-micro: 11px; /* 탭 라벨 */
+}
+
 body {
   -webkit-tap-highlight-color: transparent;
 }
