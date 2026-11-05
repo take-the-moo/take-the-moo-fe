@@ -4,7 +4,15 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { authApi } from "@/api/auth";
 import { ApiError } from "@/api/client";
-import { Button, FieldLabel, Screen, ScreenBody, ScreenFooter, TextField, TopBar } from "@/components/ui";
+import {
+  Button,
+  FieldLabel,
+  Screen,
+  ScreenBody,
+  ScreenFooter,
+  TextField,
+  TopBar,
+} from "@/components/ui";
 import { useT, type MsgKey } from "@/i18n";
 import { useUserStore } from "@/store/user";
 
@@ -28,7 +36,9 @@ export default function LoginPage() {
       router.replace("/");
     } catch (err) {
       setError(
-        err instanceof ApiError && err.status === 401 ? "아이디 또는 비밀번호가 맞지 않습니다." : "시작하지 못했어요. 잠시 후 다시 시도해 주세요.",
+        err instanceof ApiError && err.status === 401
+          ? "아이디 또는 비밀번호가 맞지 않습니다."
+          : "시작하지 못했어요. 잠시 후 다시 시도해 주세요.",
       );
       setSaving(false);
     }
@@ -39,7 +49,9 @@ export default function LoginPage() {
       <TopBar title={t("로그인")} />
       <form onSubmit={submit} className="flex flex-1 flex-col">
         <ScreenBody>
-          <h2 className="text-heading leading-[30px] font-bold text-fg">{t("풋노트")}</h2>
+          <h2 className="text-heading leading-[30px] font-bold text-fg">
+            {t("footnote")}
+          </h2>
           <FieldLabel htmlFor="loginId">{t("아이디")}</FieldLabel>
           <TextField
             id="loginId"
@@ -80,10 +92,17 @@ export default function LoginPage() {
           )}
         </ScreenBody>
         <ScreenFooter>
-          <Button type="submit" disabled={saving || !loginId.trim() || !password}>
+          <Button
+            type="submit"
+            disabled={saving || !loginId.trim() || !password}
+          >
             {saving ? t("로그인하는 중…") : t("로그인")}
           </Button>
-          <Button type="button" variant="text" onClick={() => router.push("/signup")}>
+          <Button
+            type="button"
+            variant="text"
+            onClick={() => router.push("/signup")}
+          >
             {t("계정이 없나요? 가입하기")}
           </Button>
         </ScreenFooter>

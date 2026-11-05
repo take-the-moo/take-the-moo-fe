@@ -6,9 +6,12 @@ const env = process.env.CAP_ENV ?? "dev";
 
 const config: CapacitorConfig = {
   appId: "com.storywalk.app",
-  appName: "풋노트",
+  appName: "footnote",
   webDir: "out",
-  server: env === "dev" ? { url: "http://localhost:3000", cleartext: true } : undefined,
+  server:
+    env === "dev"
+      ? { url: "http://localhost:3000", cleartext: true }
+      : undefined,
 };
 
 export default config;

@@ -67,3 +67,52 @@ body {
   line-height: 1.2; /* Figma의 line-height normal(Noto Sans KR) */
   -webkit-tap-highlight-color: transparent;
 }
+
+/* 화면 전환: 이전 화면은 빠르게 사라지고 새 화면이 살짝 떠오른다 */
+::view-transition {
+  pointer-events: none; /* 전환 중에도 터치를 놓치지 않게 */
+}
+
+::view-transition-old(.screen) {
+  animation: screen-out 120ms ease-out both;
+}
+
+::view-transition-new(.screen) {
+  animation: screen-in 240ms ease-out both;
+}
+
+/* 탭바는 전환에서 빼고 맨 위에 고정한다. 그냥 두면 나중에 그려지는 새 화면이 덮어서 사라졌다 나온다 */
+::view-transition-group(tab-bar) {
+  animation: none;
+  z-index: 100;
+}
+
+::view-transition-old(tab-bar) {
+  display: none;
+}
+
+::view-transition-new(tab-bar) {
+  animation: none;
+}
+
+@keyframes screen-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes screen-in {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}

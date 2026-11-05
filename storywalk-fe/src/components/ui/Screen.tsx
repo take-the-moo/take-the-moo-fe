@@ -1,18 +1,22 @@
+import { ViewTransition } from "react";
 import { cn } from "@/lib/cn";
 
 type Props = { className?: string; children: React.ReactNode };
 
 // 화면 골격. 레이아웃의 safe-area 여백을 뺀 높이를 채워서 footer·탭바가 항상 아래에 붙게 한다.
+// 모든 화면의 뿌리라 화면 전환도 여기서 건다 (애니메이션은 globals.css의 .screen). 레이아웃은 이동해도 유지돼서 enter·exit가 불리지 않는다.
 export function Screen({ className, children }: Props) {
   return (
-    <div
-      className={cn(
-        "flex min-h-[calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom))] flex-col bg-surface",
-        className,
-      )}
-    >
-      {children}
-    </div>
+    <ViewTransition enter="screen" exit="screen" default="none">
+      <div
+        className={cn(
+          "flex min-h-[calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom))] flex-col bg-surface",
+          className,
+        )}
+      >
+        {children}
+      </div>
+    </ViewTransition>
   );
 }
 

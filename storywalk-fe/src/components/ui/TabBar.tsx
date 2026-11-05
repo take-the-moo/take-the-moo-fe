@@ -19,6 +19,7 @@ export function TabBar({ className }: { className?: string }) {
 
   return (
     <nav
+      style={{ viewTransitionName: "tab-bar" }} // 탭을 옮겨도 탭바는 그 자리에 있게 한다
       className={cn(
         "sticky bottom-0 z-20 flex h-[78px] shrink-0 items-start justify-between border-t border-line-subtle bg-surface px-6 pt-2.5",
         className,

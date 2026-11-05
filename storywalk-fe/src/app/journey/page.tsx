@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { toBlob } from "html-to-image";
+import { motion, useReducedMotion } from "motion/react";
 import { useRef, useState } from "react";
 import { visitsApi } from "@/api/visits";
 import { Button, ImagePlaceholder, Screen, ScreenBody, ScreenFooter, SectionTitle, TextArea, TopBar } from "@/components/ui";
@@ -31,6 +32,7 @@ const PINS = [
   [78, 181],
   [233, 207],
 ];
+const MOMENT_STEP = 0.25; // 카드가 한 장씩 나오는 간격(초)
 const seoulToday = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul" }).format(new Date());
 
 function momentLabel(m: Moment, t: ReturnType<typeof useT>) {
@@ -194,15 +196,24 @@ export default function JourneyPage() {
 }
 
 // 사진 카드 4장을 실로 이은 보드. 순간이 적으면 있는 카드까지만 잇는다.
+// 카드는 핀과 함께 한 장씩 나오고, 실은 이어지는 카드가 나온 뒤에 나타난다.
+// CSS 애니메이션 대신 motion을 쓴다: 저장 이미지(html-to-image)가 복제한 CSS 애니메이션은 첫 프레임(투명)으로 찍힌다.
 function MomentBoard({ moments, image, lang }: { moments: Moment[]; image: (name: string) => string | null; lang: string | null }) {
   const t = useT();
   const count = moments.length;
-  /* eslint-disable @next/next/no-img-element */
+  const reduced = useReducedMotion();
+  const appear = (step: number, from?: { y: number; scale: number }) => ({
+    initial: reduced ? false : { opacity: 0, ...from },
+    animate: { opacity: 1, y: 0, scale: 1 },
+    transition: { delay: step * MOMENT_STEP, duration: 0.35 },
+  });
+
   return (
     <div className="relative mx-auto h-[350px] w-[321px]">
-      {count >= 3 && <img src="/images/journey/string-back.svg" alt="" className="absolute top-[28px] left-[82px]" />}
+      {count >= 3 && <motion.img {...appear(2)} src="/images/journey/string-back.svg" alt="" className="absolute top-[28px] left-[82px]" />}
       {moments.map((m, i) => (
-        <article
+        <motion.article
+          {...appear(i, { y: 14, scale: 0.94 })}
           key={`${m.kind}-${m.date}-${m.name}`}
           style={CARDS[i]}
           className="absolute flex w-[146px] flex-col gap-2.5 rounded-control border border-line bg-surface px-2 pt-2 pb-2.5"
@@ -212,14 +223,13 @@ function MomentBoard({ moments, image, lang }: { moments: Moment[]; image: (name
             <p className="text-caption text-fg">{monthDay(m.date, lang)}</p>
             <p className="truncate text-micro text-fg-muted">{momentLabel(m, t)}</p>
           </div>
-        </article>
+        </motion.article>
       ))}
-      {count >= 2 && <img src="/images/journey/string-top.svg" alt="" style={{ rotate: "3.69deg" }} className="absolute top-[10px] left-[82px]" />}
-      {count >= 4 && <img src="/images/journey/string-bottom.svg" alt="" style={{ rotate: "7.77deg" }} className="absolute top-[196px] left-[80px]" />}
-      {PINS.slice(0, count).map(([left, top]) => (
-        <span key={left + top} aria-hidden style={{ left, top }} className="absolute size-2.5 rounded-full bg-primary" />
+      {count >= 2 && <motion.img {...appear(1)} src="/images/journey/string-top.svg" alt="" style={{ rotate: "3.69deg" }} className="absolute top-[10px] left-[82px]" />}
+      {count >= 4 && <motion.img {...appear(3)} src="/images/journey/string-bottom.svg" alt="" style={{ rotate: "7.77deg" }} className="absolute top-[196px] left-[80px]" />}
+      {PINS.slice(0, count).map(([left, top], i) => (
+        <motion.span {...appear(i)} key={left + top} aria-hidden style={{ left, top }} className="absolute size-2.5 rounded-full bg-primary" />
       ))}
     </div>
   );
-  /* eslint-enable @next/next/no-img-element */
 }
