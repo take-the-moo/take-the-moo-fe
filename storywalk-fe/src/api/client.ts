@@ -24,6 +24,12 @@ export function setAccessToken(token: string | null) {
   accessToken = token;
 }
 
+// 토큰을 붙인 요청이 401이면 부른다 (토큰 만료·잘못됨 → 로그인 화면으로). 로그인 요청(auth: false)은 제외.
+let onUnauthorized: (() => void) | null = null;
+export function setUnauthorizedHandler(handler: (() => void) | null) {
+  onUnauthorized = handler;
+}
+
 export function getApiUrl(path: string): string {
   return `${BASE_URL}/api${path}`;
 }
@@ -58,7 +64,10 @@ async function request(path: string, { auth = true, ...init }: ApiRequestInit = 
   else if (accessToken) headers.set("Authorization", `Bearer ${accessToken}`);
 
   const res = await fetch(getApiUrl(path), { ...init, headers });
-  if (!res.ok) throw await responseError(res);
+  if (!res.ok) {
+    if (res.status === 401 && auth) onUnauthorized?.();
+    throw await responseError(res);
+  }
   return res;
 }
 

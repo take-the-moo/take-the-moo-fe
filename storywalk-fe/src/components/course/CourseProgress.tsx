@@ -3,11 +3,18 @@
 import { Fragment } from "react";
 import { CheckCircle } from "@/components/ui";
 import { useT } from "@/i18n";
-import type { Place } from "@/mocks/sample";
 import { cn } from "@/lib/cn";
 
 // Figma: 06 'course-progress' · 08 'course' 안의 단계 표시 — ✓원(16) + 이름 → 화살표 → …
-export function CourseSteps({ stops, doneIds }: { stops: Place[]; doneIds: string[] }) {
+// API 코스 정류장(placeId·name·visited)을 courseStops()로 바꿔 넘긴다.
+export type CourseStop = { id: string; shortName: string };
+
+export const courseStops = (stops: { placeId: number; name: string; visited: boolean }[]) => ({
+  stops: stops.map((s) => ({ id: String(s.placeId), shortName: s.name })),
+  doneIds: stops.filter((s) => s.visited).map((s) => String(s.placeId)),
+});
+
+export function CourseSteps({ stops, doneIds }: { stops: CourseStop[]; doneIds: string[] }) {
   const t = useT();
   return (
     <ol className="flex w-full flex-wrap items-center gap-1.5 text-caption leading-[1.45]">

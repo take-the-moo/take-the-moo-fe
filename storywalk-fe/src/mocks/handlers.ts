@@ -9,16 +9,25 @@ type Handler = (init?: RequestInit) => unknown;
 // 목에서 422를 재현하기 위한 금지어. 실제 필터는 서버(AI) 책임이다.
 const MOCK_BLOCKED_WORDS = ["광고", "바보"];
 
+const MOCK_USER = { userId: "mock_user", name: "린", nationality: "VN", language: "VI" };
+const MOCK_AUTH = { accessToken: "mock-token", expiresAt: "2099-01-01T00:00:00Z", user: MOCK_USER };
+const jsonBody = (init?: RequestInit) => (typeof init?.body === "string" ? JSON.parse(init.body) : {});
+
+// 화면 전체를 확인하려면 FE 목 대신 BE 목 모드(LLM_MOCK=true ./gradlew bootRun)에 붙인다.
+// 여기는 로그인 흐름과 한걸음 422만 BE 없이 확인할 수 있게 둔다.
 const routes: Record<string, Handler> = {
   "GET /health": () => ({ status: "ok", mock: true }),
-  "POST /users": () => ({ userId: "mock-user-1", nationality: "VN", language: "vi" }),
-  // F6 한걸음 저장. 요청 필드는 백엔드와 미확정 — 화면은 FormData(text, photo?)로 보낸다.
+  "GET /auth/check-id": () => ({ loginId: MOCK_USER.userId, available: true }),
+  "POST /auth/signup": (init) => ({ ...MOCK_AUTH, user: { ...MOCK_USER, ...jsonBody(init), userId: jsonBody(init).loginId } }),
+  "POST /auth/login": () => MOCK_AUTH,
+  "GET /users/me": () => MOCK_USER,
+  // F6 한걸음 저장 (JSON: userId, content, photoId?)
   "POST /places/:placeId/reviews": (init) => {
-    const text = init?.body instanceof FormData ? String(init.body.get("text") ?? "") : "";
-    if (MOCK_BLOCKED_WORDS.some((w) => text.includes(w))) {
-      throw new ApiError(422, "INAPPROPRIATE_CONTENT", "부적절한 표현이 있어 저장되지 않았어요");
+    const content = String(jsonBody(init).content ?? "");
+    if (MOCK_BLOCKED_WORDS.some((w) => content.includes(w))) {
+      throw new ApiError(422, "REVIEW_INAPPROPRIATE", "부적절한 표현이 있어 저장되지 않았어요");
     }
-    return { reviewId: `mock-review-${Date.now()}` };
+    return { reviewId: Date.now(), content };
   },
 };
 

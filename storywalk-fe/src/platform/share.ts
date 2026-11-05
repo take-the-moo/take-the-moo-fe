@@ -8,14 +8,14 @@ export async function sharePostcard(imageUrl: string) {
 
   if (!Capacitor.isNativePlatform()) {
     const url = URL.createObjectURL(blob);
-    const a = Object.assign(document.createElement("a"), { href: url, download: "postcard.png" });
+    const a = Object.assign(document.createElement("a"), { href: url, download: "seodaemun-postcard.jpg" });
     a.click();
     URL.revokeObjectURL(url);
     return;
   }
 
   const { uri } = await Filesystem.writeFile({
-    path: `postcard-${Date.now()}.png`,
+    path: `postcard-${Date.now()}.jpg`,
     data: await blobToBase64(blob),
     directory: Directory.Cache,
   });

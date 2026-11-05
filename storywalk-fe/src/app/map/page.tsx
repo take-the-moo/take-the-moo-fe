@@ -1,32 +1,67 @@
 "use client";
 
-import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { use, useMemo, useState } from "react";
+import { reviewsApi } from "@/api/reviews";
+import type { MapPin } from "@/api/types";
 import { TraceMap, type TracePin } from "@/components/map/TraceMap";
 import { Chip, ChipGroup, PeekSheet, Screen, ScreenBody, ScreenHeading, SectionTitle, TabBar } from "@/components/ui";
+import { usePlaces } from "@/hooks/usePlaces";
 import { useT, type MsgKey } from "@/i18n";
-import { FOOTSTEPS, MAP_FILTERS, MAP_PINS, PLACE_STATS } from "@/mocks/sample";
+import { nationalityKey, shortDate } from "@/lib/format";
+import { MAP_FILTERS, NATIONALITIES } from "@/mocks/sample";
+import { useUserStore } from "@/store/user";
 import { cn } from "@/lib/cn";
 
 // 07 흔적 지도 · F6 — Figma 1:531 (썸네일 0.6배를 390 기준으로 환산)
-// 장소별 집계·국적 분포·한걸음은 GET /map/pins, /places/{id}/reviews 연동 전까지 샘플이다.
-// 필터는 국적 하나 + '이번 주' 토글로 해석했다. 샘플이라 선택해도 숫자는 바뀌지 않는다.
+// 장소별 방문 수·국적 분포는 GET /map/pins, 한걸음은 GET /places/{id}/reviews(보는 사람 언어로 번역)다.
+// 국적 필터는 핀의 국적 분포로 화면에서 거른다. '이번 주'는 서버가 기간별 집계를 주지 않아 아직 숫자에 반영되지 않는다.
+// ?placeId=로 들어오면(한걸음 저장 직후) 그 장소를 선택한다.
 // 국적 분포 막대: 가장 큰 값이 트랙의 80%를 차지한다 (Figma 막대 비율)
 const BAR_MAX = 80;
 // 시트를 끝까지 올렸을 때 지도 높이 (Figma 지도 높이)
 const MAP_MIN_HEIGHT = 220;
+// 다녀간 사람이 아무도 없을 때 지도에 보여줄 장소 수
+const EMPTY_PIN_COUNT = 8;
 
-const PINS: TracePin[] = MAP_PINS.map(({ place, count }) => ({ id: place.id, label: place.shortName, count, at: place.at }));
+type Props = { searchParams: Promise<{ placeId?: string }> };
 
-export default function MapPage() {
+const filterCode = (label: string) => NATIONALITIES.find((n) => n.label === label)?.code ?? null;
+
+function toPins(pins: MapPin[], code: string | null): TracePin[] {
+  const counted = pins.map((p) => ({
+    id: String(p.placeId),
+    label: p.name,
+    count: code ? (p.nationalities.find((n) => n.nationality === code)?.count ?? 0) : p.visitorCount,
+    at: [p.longitude, p.latitude] as [number, number],
+  }));
+  const visited = counted.filter((p) => p.count > 0);
+  return visited.length > 0 ? visited : counted.slice(0, EMPTY_PIN_COUNT);
+}
+
+export default function MapPage({ searchParams }: Props) {
+  const { placeId: initialId } = use(searchParams);
   const t = useT();
-  const [nationality, setNationality] = useState<string>("베트남");
+  const userId = useUserStore((s) => s.userId);
+  const places = usePlaces();
+  const [nationality, setNationality] = useState<string>("전체");
   const [thisWeek, setThisWeek] = useState(false);
-  const [selectedId, setSelectedId] = useState(PLACE_STATS.place.id);
+  const [selected, setSelected] = useState<string | null>(initialId ?? null);
 
-  const selectedPin = MAP_PINS.find((p) => p.place.id === selectedId);
-  // 국적 분포 샘플은 형무소역사관 것뿐이라, 다른 장소를 고르면 총계만 보여준다.
-  const stats = selectedId === PLACE_STATS.place.id ? PLACE_STATS : null;
-  const maxPct = Math.max(...PLACE_STATS.byNationality.map((n) => n.pct));
+  const pins = useMemo(() => toPins(places.data ?? [], filterCode(nationality)), [places.data, nationality]);
+  const selectedId = selected ?? pins[0]?.id ?? null;
+  const selectedPlace = places.data?.find((p) => String(p.placeId) === selectedId);
+
+  const reviews = useQuery({
+    queryKey: ["reviews", selectedPlace?.placeId, userId],
+    queryFn: ({ signal }) => reviewsApi.getList(selectedPlace!.placeId, { userId: userId ?? undefined }, signal),
+    enabled: Boolean(selectedPlace),
+  });
+
+  const distribution = selectedPlace?.nationalities ?? [];
+  const total = distribution.reduce((sum, n) => sum + n.count, 0);
+  const stats = distribution.map((n) => ({ label: nationalityKey(n.nationality), pct: Math.round((n.count / total) * 100) }));
+  const maxPct = Math.max(0, ...stats.map((n) => n.pct));
 
   return (
     // 지도가 남은 높이를 채우도록 화면을 뷰포트에 고정한다. 긴 내용은 시트 안에서만 스크롤한다.
@@ -46,15 +81,21 @@ export default function MapPage() {
       </ScreenBody>
 
       <div className="flex min-h-0 flex-1 flex-col bg-surface-sunken">
-        {/* isolate: 지도 SDK 내부 z-index가 밖으로 새지 않게 가둔다 */}
-        <TraceMap pins={PINS} selectedId={selectedId} onSelect={setSelectedId} className="isolate h-auto! min-h-0 flex-1 rounded-none!" />
+        {/* isolate: 지도 SDK 내부 z-index가 밖으로 새지 않게 가둔다. 지도는 핀으로 처음 영역을 정해서 핀을 받은 뒤 그린다 */}
+        {pins.length > 0 && selectedId ? (
+          <TraceMap pins={pins} selectedId={selectedId} onSelect={setSelected} className="isolate h-auto! min-h-0 flex-1 rounded-none!" />
+        ) : (
+          <p className="flex flex-1 items-center justify-center text-caption text-fg-muted">
+            {places.isError ? t("불러오지 못했어요. 잠시 후 다시 시도해 주세요.") : t("불러오는 중…")}
+          </p>
+        )}
         <PeekSheet
           keep={MAP_MIN_HEIGHT}
-          title={t("{place} · 다녀간 유학생 {count}명", { place: selectedPin?.place.name ?? "", count: (stats ? stats.total : selectedPin?.count) ?? 0 })}
+          title={t("{place} · 다녀간 유학생 {count}명", { place: selectedPlace?.name ?? "", count: selectedPlace?.visitorCount ?? 0 })}
         >
-          {stats && (
+          {stats.length > 0 && (
             <div className="flex flex-col gap-1.5">
-              {stats.byNationality.map((n, i) => (
+              {stats.map((n, i) => (
                 <div key={n.label} className="flex items-center gap-2 text-micro leading-[1.45]">
                   <span className="w-11 shrink-0 font-medium text-fg-caption">{t(n.label as MsgKey)}</span>
                   <span className="flex h-2 flex-1 items-center">
@@ -71,17 +112,19 @@ export default function MapPage() {
 
           <SectionTitle>{t("한걸음")}</SectionTitle>
           <ul className="flex flex-col gap-3">
-            {FOOTSTEPS.map((f) => (
-              <li key={f.id} className="flex gap-2.5">
+            {reviews.data?.reviews.map((r) => (
+              <li key={r.reviewId} className="flex gap-2.5">
                 <span aria-hidden className="size-8 shrink-0 rounded-full bg-line" />
                 <div className="flex min-w-0 flex-1 flex-col gap-0.5 leading-[1.45]">
                   <p className="text-micro font-medium text-fg-muted">
-                    {t(f.nationality as MsgKey)} · {f.date}
+                    {t(nationalityKey(r.nationality) as MsgKey)} · {shortDate(r.writtenDate)}
                   </p>
-                  <p className="text-label text-fg">{f.text}</p>
+                  <p className="text-label text-fg">{r.translatedContent ?? r.content}</p>
                 </div>
               </li>
             ))}
+            {reviews.data?.reviews.length === 0 && <li className="text-label text-fg-muted">{t("한걸음이 아직 없어요")}</li>}
+            {reviews.isPending && selectedPlace && <li className="text-label text-fg-muted">{t("불러오는 중…")}</li>}
           </ul>
         </PeekSheet>
       </div>

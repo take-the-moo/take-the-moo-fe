@@ -1,27 +1,36 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { api } from "@/api/client";
+import { useEffect, useState } from "react";
+import { authApi } from "@/api/auth";
+import { ApiError } from "@/api/client";
+import { toApiLanguage, toApiNationality } from "@/api/codes";
 import { Button, Chip, ChipGroup, Divider, Screen, ScreenFooter } from "@/components/ui";
 import { useT } from "@/i18n";
 import { LANGUAGES, NATIONALITIES } from "@/mocks/sample";
 import { getCurrentPosition } from "@/platform/location";
+import { useSignupStore } from "@/store/signup";
 import { useUserStore } from "@/store/user";
 
 // 01 처음 설정 · F1 — Figma 1:298 (썸네일 0.6배를 390 기준으로 환산)
-// 시작하기: POST /users로 익명 사용자 생성 → 위치 권한 요청(1회 조회) → 03 홈.
-// v3.1에서 위치 거부 분기(02 역 선택)를 흐름에서 뺐다. 요구서의 대체 경로 유지 여부는 미정이라
-// 여기서는 거부·실패해도 홈으로 보내고, 홈이 위치 없이 동작하도록 둔다.
+// 시작하기: N1에서 받은 아이디·비밀번호·이름 + 국적·언어로 POST /auth/signup → 토큰 저장
+// → 위치 권한 요청(1회 조회) → 03 홈. 가입 입력이 없으면(새로고침 등) N1부터 다시 한다.
+// 위치를 거부·실패해도 홈으로 보내고, 홈은 위치 없이(기본 역 기준) 동작한다.
 type Status = { kind: "idle" } | { kind: "saving" } | { kind: "error"; message: string };
 
 export default function SetupPage() {
   const router = useRouter();
-  const setUser = useUserStore((s) => s.setUser);
+  const setSession = useUserStore((s) => s.setSession);
+  const draft = useSignupStore((s) => s.draft);
+  const clearDraft = useSignupStore((s) => s.clear);
   const [nationality, setNationality] = useState<string>("VN");
   const [language, setLanguage] = useState<string>("vi");
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   const t = useT(language); // 고르는 즉시 화면에 반영한다
+
+  useEffect(() => {
+    if (!draft && status.kind === "idle") router.replace("/signup");
+  }, [draft, status.kind, router]);
 
   const pickNationality = (code: string, defaultLang: string) => {
     setNationality(code);
@@ -29,15 +38,22 @@ export default function SetupPage() {
   };
 
   const start = async () => {
+    if (!draft) return;
     setStatus({ kind: "saving" });
     try {
-      const user = await api<{ userId: string }>("/users", {
-        method: "POST",
-        body: JSON.stringify({ nationality, language }),
+      const auth = await authApi.signup({
+        ...draft,
+        nationality: toApiNationality(nationality),
+        language: toApiLanguage(language),
       });
-      setUser({ userId: user.userId, nationality, language });
-    } catch {
-      setStatus({ kind: "error", message: t("시작하지 못했어요. 잠시 후 다시 시도해 주세요.") });
+      setSession(auth);
+      clearDraft(); // status가 saving인 채로 홈으로 가므로 아래 가입 입력 확인에 걸리지 않는다
+    } catch (e) {
+      const taken = e instanceof ApiError && e.code === "USER_LOGIN_ID_TAKEN";
+      setStatus({
+        kind: "error",
+        message: taken ? t("이미 쓰는 아이디예요. 가입 화면에서 바꿔 주세요.") : t("시작하지 못했어요. 잠시 후 다시 시도해 주세요."),
+      });
       return;
     }
     // 위치 권한 요청 — 허용하면 위치 1회 사용. 결과는 저장하지 않는다.
@@ -82,10 +98,10 @@ export default function SetupPage() {
             {status.message}
           </p>
         ) : (
-          <p className="text-center text-caption text-fg-muted">{t("로그인 없이 시작 · 이름·연락처는 받지 않아요")}</p>
+          <p className="text-center text-caption text-fg-muted">{t("가입을 마치면 바로 시작해요")}</p>
         )}
         {/* 트리거 5 */}
-        <Button onClick={start} disabled={status.kind === "saving"}>
+        <Button onClick={start} disabled={!draft || status.kind === "saving"}>
           {status.kind === "saving" ? t("준비하는 중…") : t("시작하기")}
         </Button>
       </ScreenFooter>
