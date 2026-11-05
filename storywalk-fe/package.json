@@ -29,6 +29,7 @@
   "devDependencies": {
     "@capacitor/cli": "^8.6.0",
     "@tailwindcss/turbopack": "^4",
+    "@types/navermaps": "3.9.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

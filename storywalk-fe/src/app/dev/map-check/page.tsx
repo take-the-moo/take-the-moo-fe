@@ -14,15 +14,15 @@ const POINTS: { name: string; at: LngLat }[] = [
 export default function MapCheck() {
   const mapEl = useRef<HTMLDivElement>(null);
   const panoEl = useRef<HTMLDivElement>(null);
-  const panoRef = useRef<any>(null);
+  const panoRef = useRef<naver.maps.Panorama | null>(null);
   const [ready, setReady] = useState(false);
   const [log, setLog] = useState<string[]>([]);
   const push = (s: string) => setLog((l) => [...l, s]);
 
   useEffect(() => {
     let cancelled = false;
-    let map: InstanceType<typeof naver.maps.Map> | undefined;
-    let pano: InstanceType<typeof naver.maps.Panorama> | undefined;
+    let map: naver.maps.Map | undefined;
+    let pano: naver.maps.Panorama | undefined;
     const panoContainer = panoEl.current;
     let authFailed = false;
     const onAuthFailure = (event: Event) => {
