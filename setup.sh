@@ -8,18 +8,26 @@ set -euo pipefail
 APP_DIR="${APP_DIR:-storywalk-fe}"
 APP_NAME="Seoul Storywalk"
 APP_ID="com.storywalk.app"
+PNPM_VERSION="12.16.1" # storywalk-fe/package.json의 packageManager와 맞춘다
+
+# 패키지 매니저는 pnpm만 사용한다.
+if ! command -v pnpm >/dev/null 2>&1; then
+  echo "pnpm이 필요합니다: npm i -g pnpm@$PNPM_VERSION (또는 https://pnpm.io/installation)" >&2
+  exit 1
+fi
 
 echo "==> 1/7 Next.js 프로젝트 생성"
-npx --yes create-next-app@latest "$APP_DIR" \
-  --ts --tailwind --eslint --app --src-dir --import-alias "@/*" --use-npm --yes
+pnpm dlx create-next-app@latest "$APP_DIR" \
+  --ts --tailwind --eslint --app --src-dir --import-alias "@/*" --use-pnpm --yes
 cd "$APP_DIR"
+pnpm pkg set packageManager="pnpm@$PNPM_VERSION"
 
 echo "==> 2/7 패키지 설치"
-npm i @tanstack/react-query zustand motion \
+pnpm add @tanstack/react-query zustand motion \
   @capacitor/core @capacitor/ios \
   @capacitor/geolocation @capacitor/camera @capacitor/local-notifications \
   @capacitor/filesystem @capacitor/share
-npm i -D @capacitor/cli
+pnpm add -D @capacitor/cli
 
 echo "==> 3/7 설정 파일 작성"
 cat > next.config.ts <<'EOF'
@@ -37,6 +45,30 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+EOF
+
+# ios/ 아래 Xcode·SPM 빌드 생성물(.build, DerivedData)이 린트 대상에 들어가지 않게 한다.
+cat > eslint.config.mjs <<'EOF'
+import { defineConfig, globalIgnores } from "eslint/config";
+import nextVitals from "eslint-config-next/core-web-vitals";
+import nextTs from "eslint-config-next/typescript";
+
+const eslintConfig = defineConfig([
+  ...nextVitals,
+  ...nextTs,
+  // Override default ignores of eslint-config-next.
+  globalIgnores([
+    // Default ignores of eslint-config-next:
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+    // Capacitor iOS 네이티브 프로젝트와 Xcode 빌드 생성물(.build, DerivedData, App/public 복사본)
+    "ios/**",
+  ]),
+]);
+
+export default eslintConfig;
 EOF
 
 cat > capacitor.config.ts <<'EOF'
@@ -367,14 +399,14 @@ EOF
 echo "==> 5/7 Capacitor 초기화"
 # server.url 모드라도 webDir이 있어야 sync가 된다 (out/은 .gitignore에 포함됨)
 mkdir -p out && echo '<!doctype html><title>Seoul Storywalk</title>' > out/index.html
-npm pkg set scripts.ios="CAP_ENV=dev npx cap sync ios && npx cap open ios"
-npm pkg set scripts.cap:sync="CAP_ENV=dev npx cap sync ios"
+pnpm pkg set scripts.ios="CAP_ENV=dev cap sync ios && cap open ios"
+pnpm pkg set 'scripts["cap:sync"]=CAP_ENV=dev cap sync ios' # pnpm은 키의 ":"를 괄호 표기로 받는다
 
 if [[ "${SKIP_IOS:-0}" == "1" ]]; then
   echo "==> 6/7 iOS 생략 (SKIP_IOS=1)"
 else
   echo "==> 6/7 iOS 플랫폼 추가"
-  npx cap add ios
+  pnpm exec cap add ios
 
   PLIST="ios/App/App/Info.plist"
   PB=/usr/libexec/PlistBuddy
@@ -388,19 +420,20 @@ else
   $PB -c "Add :NSAppTransportSecurity:NSAllowsLocalNetworking bool true" "$PLIST" 2>/dev/null \
     || $PB -c "Set :NSAppTransportSecurity:NSAllowsLocalNetworking true" "$PLIST"
 
-  CAP_ENV=dev npx cap sync ios
+  CAP_ENV=dev pnpm exec cap sync ios
 fi
 
-echo "==> 7/7 타입 검사"
-npx tsc --noEmit
+echo "==> 7/7 타입·린트 검사"
+pnpm exec tsc --noEmit
+pnpm lint
 
 cat <<EOF
 
 완료. 실행 순서:
   cd $APP_DIR
-  npm run dev        # 터미널 1: localhost:3000
-  npm run ios        # 터미널 2: Xcode 열림 → 시뮬레이터 선택 → ▶ Run
+  pnpm dev           # 터미널 1: localhost:3000
+  pnpm ios           # 터미널 2: Xcode 열림 → 시뮬레이터 선택 → ▶ Run
 
 BE 연결 시 .env.local의 NEXT_PUBLIC_USE_MOCK=false 로 변경 후 dev 서버 재시작.
-시연 리허설부터는 'npm run build && npm run start' 로 실행.
+시연 리허설부터는 'pnpm build && pnpm start' 로 실행.
 EOF
