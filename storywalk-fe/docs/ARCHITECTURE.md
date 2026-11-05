@@ -7,6 +7,7 @@
 - [기획안·요구사항 v2](../../요구서.md): 서비스 범위, F1~F7, 비기능 요구사항, P0 API의 기준. 프로젝트 상위 디렉터리에 있으며 프런트엔드 폴더만 복사하면 링크 대상도 별도로 제공해야 한다.
 - [Figma 디자인 — ui_ref](https://www.figma.com/design/LiOMcefG48DP23YjkXeLgg/Untitled?node-id=0-1&t=5vN8C4Fc3uBkVfOp-1): 화면 및 사용자 흐름의 참조.
 - [하네스 엔지니어링](HARNESS_ENGINEERING.md): 개발자·에이전트의 작업 규칙과 검증 기준.
+- [도보 경로안내 — 백엔드 전달](ROUTE_GUIDANCE_BACKEND.md): 경로 조회 API와 서버 처리 로직에 대한 미구현 협의안.
 - [루트 AGENTS.md](../AGENTS.md): Next.js 변경 전 설치된 버전의 문서를 확인하도록 하는 필수 작업 지침.
 
 Figma는 `0:1` 페이지의 메타데이터에서 `사용자 플로우 v3.1` 및 화면 이름을 확인했다. 픽셀 단위 디자인·컴포넌트 속성까지 검증한 문서는 아니다. 디자인에 있는 화면이 코드에 구현되어 있음을 뜻하지 않는다.
