@@ -71,8 +71,8 @@ export default function SetupPage() {
             <SectionTitle>{t("어느 나라에서 왔나요?")}</SectionTitle>
             <ChipGroup>
               {NATIONALITIES.map((n) => (
-                <Chip key={n.code} selected={nationality === n.code} onClick={() => pickNationality(n.code, n.defaultLang)}>
-                  {t(n.label)}
+                <Chip key={n.code} lang={n.nativeLang} selected={nationality === n.code} onClick={() => pickNationality(n.code, n.defaultLang)}>
+                  {n.native}
                 </Chip>
               ))}
             </ChipGroup>
@@ -81,8 +81,8 @@ export default function SetupPage() {
             <SectionTitle>{t("어떤 언어로 볼까요?")}</SectionTitle>
             <ChipGroup>
               {LANGUAGES.map((l) => (
-                <Chip key={l.code} selected={language === l.code} onClick={() => setLanguage(l.code)}>
-                  {t(l.label)}
+                <Chip key={l.code} lang={l.code} selected={language === l.code} onClick={() => setLanguage(l.code)}>
+                  {l.native}
                 </Chip>
               ))}
             </ChipGroup>

@@ -2,23 +2,24 @@
 
 // ── 01 처음 설정 ──────────────────────────────────────────
 // 영국·프랑스는 API 국적에 없어 OTHER로 보낸다 (api/codes.ts)
+// native는 그 나라 말로 쓴 이름이다. 가입 칩(나라·언어)은 화면 언어와 상관없이 이걸 보여준다.
 export const NATIONALITIES = [
-  { code: "VN", label: "베트남", defaultLang: "vi" },
-  { code: "CN", label: "중국", defaultLang: "zh" },
-  { code: "MN", label: "몽골", defaultLang: "mn" },
-  { code: "UZ", label: "우즈베키스탄", defaultLang: "en" },
-  { code: "JP", label: "일본", defaultLang: "ja" },
-  { code: "US", label: "미국", defaultLang: "en" },
-  { code: "GB", label: "영국", defaultLang: "en" },
-  { code: "FR", label: "프랑스", defaultLang: "en" },
+  { code: "VN", label: "베트남", native: "Việt Nam", nativeLang: "vi", defaultLang: "vi" },
+  { code: "CN", label: "중국", native: "中国", nativeLang: "zh", defaultLang: "zh" },
+  { code: "MN", label: "몽골", native: "Монгол", nativeLang: "mn", defaultLang: "mn" },
+  { code: "UZ", label: "우즈베키스탄", native: "Oʻzbekiston", nativeLang: "uz", defaultLang: "en" },
+  { code: "JP", label: "일본", native: "日本", nativeLang: "ja", defaultLang: "ja" },
+  { code: "US", label: "미국", native: "United States", nativeLang: "en", defaultLang: "en" },
+  { code: "GB", label: "영국", native: "United Kingdom", nativeLang: "en", defaultLang: "en" },
+  { code: "FR", label: "프랑스", native: "France", nativeLang: "fr", defaultLang: "en" },
 ] as const;
 
 export const LANGUAGES = [
-  { code: "vi", label: "베트남어" },
-  { code: "zh", label: "중국어" },
-  { code: "mn", label: "몽골어" },
-  { code: "en", label: "영어" },
-  { code: "ja", label: "일본어" },
+  { code: "vi", label: "베트남어", native: "Tiếng Việt" },
+  { code: "zh", label: "중국어", native: "中文" },
+  { code: "mn", label: "몽골어", native: "Монгол хэл" },
+  { code: "en", label: "영어", native: "English" },
+  { code: "ja", label: "일본어", native: "日本語" },
 ] as const;
 
 export const languageLabel = (code: string | null) => LANGUAGES.find((l) => l.code === code)?.label ?? "베트남어";
