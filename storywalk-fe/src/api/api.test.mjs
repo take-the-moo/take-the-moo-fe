@@ -98,8 +98,9 @@ test("photo upload uses multipart; reviews and postcards reference its ID in JSO
   await photosApi.upload({ file, userId: "demo_user", placeId: 34 });
   assert.ok(calls[0].body instanceof FormData);
   assert.equal(calls[0].body.get("file").name, "photo.jpg");
-  assert.equal(calls[0].body.get("userId"), "demo_user");
-  assert.equal(calls[0].body.get("placeId"), "34");
+  const uploadUrl = new URL(calls[0].url);
+  assert.equal(uploadUrl.searchParams.get("userId"), "demo_user");
+  assert.equal(uploadUrl.searchParams.get("placeId"), "34");
   assert.equal(calls[0].headers.has("Content-Type"), false);
   assert.equal(calls[0].headers.get("Authorization"), "Bearer test-token");
   await reviewsApi.create(34, { userId: "demo_user", content: "좋은 산책", photoId: "photo-1" });
