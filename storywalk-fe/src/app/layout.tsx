@@ -12,7 +12,7 @@ const notoSansKR = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Seoul Storywalk",
+  title: "풋노트",
   description: "서대문 유학생을 위한 발자취 서비스",
 };
 

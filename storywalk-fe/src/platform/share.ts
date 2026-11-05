@@ -3,23 +3,25 @@ import { Directory, Filesystem } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
 
 // 앱: 네이티브 공유 시트(사진 저장·메신저 전송) / 웹: 파일 다운로드
-export async function sharePostcard(imageUrl: string) {
-  const blob = await (await fetch(imageUrl)).blob();
-
+export async function saveImage(blob: Blob, filename: string, title: string) {
   if (!Capacitor.isNativePlatform()) {
     const url = URL.createObjectURL(blob);
-    const a = Object.assign(document.createElement("a"), { href: url, download: "seodaemun-postcard.jpg" });
+    const a = Object.assign(document.createElement("a"), { href: url, download: filename });
     a.click();
     URL.revokeObjectURL(url);
     return;
   }
 
   const { uri } = await Filesystem.writeFile({
-    path: `postcard-${Date.now()}.jpg`,
+    path: `${Date.now()}-${filename}`,
     data: await blobToBase64(blob),
     directory: Directory.Cache,
   });
-  await Share.share({ title: "오늘의 서대문 엽서", files: [uri] });
+  await Share.share({ title, files: [uri] });
+}
+
+export async function sharePostcard(imageUrl: string) {
+  await saveImage(await (await fetch(imageUrl)).blob(), "seodaemun-postcard.jpg", "오늘의 서대문 엽서");
 }
 
 function blobToBase64(blob: Blob): Promise<string> {

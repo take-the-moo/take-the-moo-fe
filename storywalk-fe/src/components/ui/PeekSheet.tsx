@@ -5,12 +5,14 @@ import { useEffect, useRef, useState } from "react";
 
 // 지도 아래에 붙는 시트. 부모는 세로 flex이고, 형제(지도)가 flex-1로 남은 높이를 채운다.
 // 시트 높이가 변하면 형제 높이가 반대로 변한다: 내리면 머리(PEEK)만 남고, 올리면 위에 keep만큼만 남긴다.
-// 머리를 끌거나 탭해서 움직이고, 본문은 시트 안에서만 스크롤한다.
-const PEEK = 64;
+// 손잡이를 끌거나 탭해서 움직인다. head(필터 칩)는 내린 상태에서도 보이고, 본문은 시트 안에서만 스크롤한다.
+const PEEK = 105;
 const FLICK = 300; // 이 속도(px/s)를 넘으면 위치와 상관없이 튕긴 방향으로 간다
 const SPRING = { type: "spring", stiffness: 400, damping: 40 } as const;
 
-export function PeekSheet({ title, keep, children }: { title: string; keep: number; children: React.ReactNode }) {
+type Props = { label: string; head: React.ReactNode; keep: number; children: React.ReactNode };
+
+export function PeekSheet({ label, head, keep, children }: Props) {
   const sheet = useRef<HTMLElement>(null);
   const openRef = useRef(false);
   const panning = useRef(false);
@@ -40,13 +42,14 @@ export function PeekSheet({ title, keep, children }: { title: string; keep: numb
   return (
     <motion.section
       ref={sheet}
-      aria-label={title}
+      aria-label={label}
       style={{ height }}
-      className="flex shrink-0 flex-col overflow-hidden rounded-t-sheet border-t border-line-subtle bg-surface"
+      className="relative z-10 -mt-[15px] flex shrink-0 flex-col overflow-hidden rounded-t-sheet bg-surface"
     >
       <motion.button
         type="button"
         aria-expanded={open}
+        aria-label={label}
         onPanStart={() => {
           panning.current = true;
           height.stop();
@@ -62,12 +65,12 @@ export function PeekSheet({ title, keep, children }: { title: string; keep: numb
           if (!panning.current) snap(!open);
           panning.current = false;
         }}
-        className="flex h-16 shrink-0 cursor-grab touch-none flex-col select-none items-center gap-3 px-5 pt-2"
+        className="flex h-7 shrink-0 cursor-grab touch-none justify-center pt-[7px] select-none"
       >
-        <span aria-hidden className="h-1 w-10 rounded-[2px] bg-line" />
-        <span className="w-full truncate text-left text-label leading-[1.45] font-bold text-fg">{title}</span>
+        <span aria-hidden className="h-[5px] w-9 rounded-[4px] bg-track" />
       </motion.button>
-      <div inert={!open} className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain px-5 pb-4">
+      <div className="shrink-0 px-6 pb-5">{head}</div>
+      <div inert={!open} className="flex min-h-0 flex-1 flex-col gap-8 overflow-y-auto overscroll-contain px-6 pb-4">
         {children}
       </div>
     </motion.section>

@@ -6,12 +6,13 @@ import { useEffect, useState } from "react";
 import { getAssetUrl } from "@/api/client";
 import { postcardsApi } from "@/api/postcards";
 import { Button, CheckCircle, ImagePlaceholder, Screen, ScreenBody, ScreenFooter, TopBar } from "@/components/ui";
-import { useT, type MsgKey } from "@/i18n";
-import { POSTCARD } from "@/mocks/sample";
+import { useT } from "@/i18n";
+import { POSTCARD_SECONDS } from "@/lib/options";
 import { sharePostcard } from "@/platform/share";
 import { usePostcardStore } from "@/store/postcard";
 
-// 10 엽서 결과 · F7 — Figma 1:759 (썸네일 0.6배를 390 기준으로 환산)
+// 10 엽서 결과 · F7 — Figma 9:1189
+// 프레임·소감·날짜까지 서버가 합성한 JPEG(1200×1800)라 화면은 이미지를 그대로 보여준다.
 // 생성 중에는 상단에 진행 표시, 완료되면 결과를 보여준다 — 별도 대기 화면(N4)은 v3.1에서 삭제.
 // GET /postcards/{id}를 1.5초마다 확인해 COMPLETED면 이미지, FAILED면 다시 만들기 안내를 보여준다.
 // 진행 막대는 서버가 진행률을 주지 않아 예상 시간 기준으로 채우고, 끝나기 전에는 90%에서 멈춘다.
@@ -46,13 +47,8 @@ export default function PostcardResultPage() {
     return () => clearInterval(timer);
   }, [generating]);
 
-  const expectedMs = POSTCARD.expectedSeconds * 1000;
+  const expectedMs = POSTCARD_SECONDS * 1000;
   const progress = job && generating ? Math.min(0.9, (now - job.startedAt) / expectedMs) : 1;
-  const style = job?.style ?? "수채화";
-  const note = job?.note ?? "";
-  const caption = new Intl.DateTimeFormat("ko", { year: "numeric", month: "numeric", day: "numeric" }).format(
-    job ? new Date(job.startedAt) : new Date(),
-  );
 
   const save = async () => {
     if (!downloadUrl) {
@@ -69,40 +65,34 @@ export default function PostcardResultPage() {
   return (
     <Screen>
       <TopBar title={t("나의 서대문 엽서")} />
-      <ScreenBody>
-        <div className="flex flex-col gap-2 rounded-control bg-surface-sunken px-3 py-2.5" role="status" aria-live="polite">
+      <ScreenBody className="gap-3! items-center">
+        <div className="flex w-full flex-col gap-2 rounded-control bg-surface-sunken p-3.5" role="status" aria-live="polite">
           <div className="flex items-center gap-2.5">
             {generating ? (
-              <span aria-hidden className="size-[18px] shrink-0 animate-spin rounded-full border-2 border-line-strong border-t-ink" />
+              <span aria-hidden className="size-5 shrink-0 animate-spin rounded-full border-2 border-line-strong border-t-fg" />
             ) : (
-              <CheckCircle size={18} done={!failed} />
+              <CheckCircle done={!failed} />
             )}
-            <p className="text-caption leading-[1.45] font-medium text-fg-sub">
+            <p className="text-caption leading-[1.5] font-medium text-fg-sub">
               {failed
                 ? t("엽서를 만들지 못했어요. 다시 만들어 주세요.")
                 : generating
-                  ? t("엽서를 만들고 있어요 · 약 {seconds}초 · 다른 화면에 가 있어도 돼요", { seconds: POSTCARD.expectedSeconds })
+                  ? t("엽서를 만들고 있어요 · 약 {seconds}초 · 다른 화면에 가 있어도 돼요", { seconds: POSTCARD_SECONDS })
                   : t("완성됐어요")}
             </p>
           </div>
           {generating && (
             <div className="h-1 w-full overflow-hidden rounded-full bg-line" aria-hidden>
-              <div className="h-full rounded-full bg-ink transition-[width]" style={{ width: `${progress * 100}%` }} />
+              <div className="h-full rounded-full bg-primary transition-[width]" style={{ width: `${progress * 100}%` }} />
             </div>
           )}
         </div>
 
-        <article className="flex flex-col gap-3 rounded-box border-2 border-primary bg-surface p-3">
-          <ImagePlaceholder
-            src={imageUrl}
-            label={generating ? t("엽서를 그리는 중…") : t("AI 생성 엽서 (사진 {count}장 + 소감 + {style})", { count: job?.photoCount ?? 1, style: t(style as MsgKey) })}
-            className={imageUrl ? "h-auto" : "h-[300px]"}
-          />
-          <div className="flex flex-col gap-1 px-1 leading-[1.45]">
-            <p className="text-caption font-bold text-fg-caption">{caption}</p>
-            {note && <p className="text-[15px] font-medium text-ink">“{note}”</p>}
-          </div>
-        </article>
+        <ImagePlaceholder
+          src={imageUrl}
+          label={generating ? t("엽서를 그리는 중…") : t("나의 서대문 엽서")}
+          className="aspect-[2/3] rounded-[3px]! border border-[#1f1f1e]"
+        />
         {saveError && (
           <p role="alert" className="text-caption text-fg">
             {saveError}

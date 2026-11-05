@@ -1,7 +1,7 @@
 import type { Language, Nationality } from "./types";
 
-// 화면 코드값(국적 칩 VN·NP·ETC, UI 언어 vi·en…) ↔ API 코드값(VN·OTHER, VI·EN…) 변환.
-// 화면 목록에는 API에 없는 국적(네팔·기타)이 있어 API로 보낼 때 OTHER로 바꾼다.
+// 화면 코드값(국적 칩 VN·GB·ETC, UI 언어 vi·en…) ↔ API 코드값(VN·OTHER, VI·EN…) 변환.
+// 화면 목록에는 API에 없는 국적(영국·프랑스)이 있어 API로 보낼 때 OTHER로 바꾼다.
 const API_NATIONALITIES: readonly string[] = ["VN", "CN", "JP", "MN", "UZ", "US", "OTHER"] satisfies Nationality[];
 const API_LANGUAGES: readonly string[] = ["KO", "EN", "VI", "ZH", "JA", "MN", "UZ"] satisfies Language[];
 

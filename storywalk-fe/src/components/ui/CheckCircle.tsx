@@ -1,33 +1,12 @@
 import { cn } from "@/lib/cn";
 
-// Figma 곳곳의 '✓ 원' — 진행 단계(16), 엽서 상태(18), 사진 선택(20), 도장 칸(30).
-// done=false면 회색 테두리의 빈 원(진행 단계) 또는 '?' 원(아직 못 받은 도장)이 된다.
-type Props = { size: number; done?: boolean; pending?: "empty" | "question"; className?: string };
-
-export function CheckCircle({ size, done = true, pending = "empty", className }: Props) {
-  const fontSize = Math.round(size * 0.4);
-  if (done) {
-    return (
-      <span
-        aria-hidden
-        style={{ width: size, height: size, fontSize }}
-        className={cn("inline-flex shrink-0 items-center justify-center rounded-full bg-ink font-bold text-on-primary", className)}
-      >
-        ✓
-      </span>
-    );
-  }
+// Figma: radio — 완료는 노란 원 + 체크, 아니면 회색 테두리의 빈 원 (20px)
+export function CheckCircle({ done = true, className }: { done?: boolean; className?: string }) {
+  if (!done) return <span aria-hidden className={cn("size-5 shrink-0 rounded-full border border-line-strong", className)} />;
   return (
-    <span
-      aria-hidden
-      style={{ width: size, height: size, fontSize }}
-      className={cn(
-        "inline-flex shrink-0 items-center justify-center rounded-full border-[1.5px] border-fg-disabled bg-surface font-bold text-fg-disabled",
-        pending === "question" && "border-line-strong",
-        className,
-      )}
-    >
-      {pending === "question" ? "?" : null}
-    </span>
+    <svg aria-hidden width="20" height="20" viewBox="0 0 20 20" fill="none" className={cn("shrink-0", className)}>
+      <rect x="0.5" y="0.5" width="19" height="19" rx="9.5" fill="#FCFF5B" stroke="#1D1D1D" />
+      <path d="M6.5 10L9.125 12.625L13.5 7.375" stroke="black" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   );
 }

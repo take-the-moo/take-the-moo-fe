@@ -22,7 +22,6 @@ export const messages = {
   "우즈베키스탄": { vi: "Uzbekistan", zh: "乌兹别克斯坦", mn: "Узбекистан", en: "Uzbekistan", ja: "ウズベキスタン" },
   "일본": { vi: "Nhật Bản", zh: "日本", mn: "Япон", en: "Japan", ja: "日本" },
   "미국": { vi: "Hoa Kỳ", zh: "美国", mn: "Америк", en: "United States", ja: "アメリカ" },
-  "네팔": { vi: "Nepal", zh: "尼泊尔", mn: "Балба", en: "Nepal", ja: "ネパール" },
   "기타": { vi: "Khác", zh: "其他", mn: "Бусад", en: "Other", ja: "その他" },
   "베트남어": { vi: "Tiếng Việt", zh: "越南语", mn: "Вьетнам хэл", en: "Vietnamese", ja: "ベトナム語" },
   "중국어": { vi: "Tiếng Trung", zh: "中文", mn: "Хятад хэл", en: "Chinese", ja: "中国語" },
@@ -31,7 +30,7 @@ export const messages = {
   "일본어": { vi: "Tiếng Nhật", zh: "日语", mn: "Япон хэл", en: "Japanese", ja: "日本語" },
 
   // ── 00 시작 · 01 처음 설정 ──
-  "서대문 발자취": { vi: "Dấu chân Seodaemun", zh: "西大门足迹", mn: "Сөдэмүний мөр", en: "Seodaemun Footprints", ja: "西大門の足跡" },
+  "풋노트": { vi: "Footnote", zh: "Footnote", mn: "Footnote", en: "Footnote", ja: "フットノート" },
   "서대문을 다녀간 유학생들의 발자취를 따라\n오늘의 한 장면을 만나요.": {
     vi: "Theo dấu chân của các du học sinh đã đến Seodaemun,\nhãy gặp một khoảnh khắc của hôm nay.",
     zh: "沿着留学生们在西大门留下的足迹，\n邂逅今天的一个场景。",
@@ -39,9 +38,7 @@ export const messages = {
     en: "Follow the footprints of students who visited Seodaemun\nand discover a scene for today.",
     ja: "西大門を訪れた留学生の足跡をたどって、\n今日のワンシーンに出会いましょう。",
   },
-  "로고": { vi: "Logo", zh: "标志", mn: "Лого", en: "Logo", ja: "ロゴ" },
-  "Let's get started": { vi: "Bắt đầu nào", zh: "开始吧", mn: "Эхэлцгээе", en: "Let's get started", ja: "はじめましょう" },
-  "가입하면 선호하는 관광지·관심사에 맞춰\n장소를 먼저 추천받아요": {
+  "가입하면 선호하는 관광지·관심사에 맞춰\n장소를 먼저 추천받을 수 있어요": {
     vi: "Đăng ký để được gợi ý trước những địa điểm\nhợp với sở thích của bạn",
     zh: "注册后，将优先为你推荐\n符合喜好和兴趣的地点",
     mn: "Бүртгүүлбэл таны сонирхолд тохирсон\nгазруудыг түрүүлж санал болгоно",
@@ -49,14 +46,6 @@ export const messages = {
     ja: "登録すると、好みの観光地や関心に合わせて\n場所を優先しておすすめします",
   },
   "가입하기": { vi: "Đăng ký", zh: "注册", mn: "Бүртгүүлэх", en: "Sign up", ja: "登録する" },
-  "가입 없이 시작하기": { vi: "Bắt đầu không cần đăng ký", zh: "无需注册，直接开始", mn: "Бүртгүүлэхгүйгээр эхлэх", en: "Start without signing up", ja: "登録せずに始める" },
-  "가입 없이도 모든 기능을 쓸 수 있어요 · 이름·연락처는 받지 않아요": {
-    vi: "Không đăng ký vẫn dùng được mọi tính năng · Chúng tôi không thu thập tên hay thông tin liên hệ",
-    zh: "无需注册也能使用全部功能 · 不收集姓名和联系方式",
-    mn: "Бүртгүүлэхгүйгээр бүх боломжийг ашиглаж болно · Нэр, холбоо барих мэдээлэл авахгүй",
-    en: "All features work without signing up · We don't collect names or contact details",
-    ja: "登録しなくてもすべての機能を使えます · 名前や連絡先はいただきません",
-  },
   "시작하지 못했어요. 잠시 후 다시 시도해 주세요.": {
     vi: "Không thể bắt đầu. Vui lòng thử lại sau.",
     zh: "无法开始，请稍后再试。",
@@ -64,54 +53,23 @@ export const messages = {
     en: "Couldn't get started. Please try again in a moment.",
     ja: "開始できませんでした。しばらくしてからもう一度お試しください。",
   },
-  "어느 나라에서 왔어요?": { vi: "Bạn đến từ nước nào?", zh: "你来自哪个国家？", mn: "Та аль улсаас ирсэн бэ?", en: "Where are you from?", ja: "どの国から来ましたか？" },
+  "어느 나라에서 왔나요?": { vi: "Bạn đến từ nước nào?", zh: "你来自哪个国家？", mn: "Та аль улсаас ирсэн бэ?", en: "Where are you from?", ja: "どの国から来ましたか？" },
   "어떤 언어로 볼까요?": { vi: "Bạn muốn xem bằng ngôn ngữ nào?", zh: "想用哪种语言查看？", mn: "Ямар хэлээр үзэх вэ?", en: "Which language would you like?", ja: "どの言語で見ますか？" },
-  "* 장면은 선택한 언어 + 쉬운 한국어로 함께 보여줘요.": {
-    vi: "* Các cảnh được hiển thị bằng ngôn ngữ bạn chọn cùng tiếng Hàn dễ hiểu.",
-    zh: "* 场景将以所选语言和简单韩语同时显示。",
-    mn: "* Үзэгдлийг сонгосон хэл болон хялбар солонгос хэлээр хамт харуулна.",
-    en: "* Scenes appear in your chosen language along with easy Korean.",
-    ja: "* シーンは選んだ言語とやさしい韓国語で一緒に表示します。",
-  },
-  "로그인 없이 시작 · 이름·연락처는 받지 않아요": {
-    vi: "Bắt đầu không cần đăng nhập · Không thu thập tên hay thông tin liên hệ",
-    zh: "无需登录即可开始 · 不收集姓名和联系方式",
-    mn: "Нэвтрэхгүйгээр эхэлнэ · Нэр, холбоо барих мэдээлэл авахгүй",
-    en: "No login needed · We don't collect names or contact details",
-    ja: "ログインなしで開始 · 名前や連絡先はいただきません",
-  },
   "준비하는 중…": { vi: "Đang chuẩn bị…", zh: "准备中…", mn: "Бэлтгэж байна…", en: "Getting ready…", ja: "準備中…" },
   "시작하기": { vi: "Bắt đầu", zh: "开始", mn: "Эхлэх", en: "Start", ja: "始める" },
 
   // ── N1 가입 ──
-  "가입하면 취향에 맞는 장소를\n먼저 보여줘요": {
+  "가입하면\n취향에 맞는 장소를\n먼저 보여줘요": {
     vi: "Đăng ký để xem trước\nnhững địa điểm hợp với bạn",
     zh: "注册后，优先展示\n符合你喜好的地点",
     mn: "Бүртгүүлбэл таны сонирхолд тохирсон\nгазруудыг түрүүлж харуулна",
     en: "Sign up to see places\nthat match your taste first",
     ja: "登録すると、好みに合う場所を\n先に表示します",
   },
-  "가입하면 선호하는 관광지 · 관심사 · 성향을 골라 추천에 바로 반영할 수 있어요.\n가입하지 않아도 모든 기능을 쓸 수 있어요.": {
-    vi: "Khi đăng ký, bạn có thể chọn địa điểm yêu thích, mối quan tâm và phong cách để áp dụng ngay vào gợi ý.\nKhông đăng ký vẫn dùng được mọi tính năng.",
-    zh: "注册后可选择喜欢的景点、兴趣和旅行风格，并立即体现在推荐中。\n不注册也能使用全部功能。",
-    mn: "Бүртгүүлбэл дуртай газар, сонирхол, аяллын хэв маягаа сонгож, санал болголтод шууд тусгаж болно.\nБүртгүүлэхгүй байсан ч бүх боломжийг ашиглаж болно.",
-    en: "Sign up to pick your favorite spots, interests, and style and apply them to recommendations right away.\nAll features work without signing up.",
-    ja: "登録すると、好みの観光地・関心・スタイルを選んで、おすすめにすぐ反映できます。\n登録しなくてもすべての機能を使えます。",
-  },
-  "Google로 계속하기": { vi: "Tiếp tục với Google", zh: "使用 Google 继续", mn: "Google-ээр үргэлжлүүлэх", en: "Continue with Google", ja: "Googleで続ける" },
-  "또는": { vi: "hoặc", zh: "或", mn: "эсвэл", en: "or", ja: "または" },
-  "이메일": { vi: "Email", zh: "电子邮箱", mn: "И-мэйл", en: "Email", ja: "メールアドレス" },
   "비밀번호": { vi: "Mật khẩu", zh: "密码", mn: "Нууц үг", en: "Password", ja: "パスワード" },
   "8자 이상": { vi: "Ít nhất 8 ký tự", zh: "至少 8 个字符", mn: "Хамгийн багадаа 8 тэмдэгт", en: "At least 8 characters", ja: "8文字以上" },
   "숨기기": { vi: "Ẩn", zh: "隐藏", mn: "Нуух", en: "Hide", ja: "隠す" },
   "보기": { vi: "Hiện", zh: "显示", mn: "Харах", en: "Show", ja: "表示" },
-  "* 이름·연락처는 받지 않아요. 이메일은 로그인에만 써요.": {
-    vi: "* Không thu thập tên hay thông tin liên hệ. Email chỉ dùng để đăng nhập.",
-    zh: "* 不收集姓名和联系方式。邮箱仅用于登录。",
-    mn: "* Нэр, холбоо барих мэдээлэл авахгүй. И-мэйлийг зөвхөн нэвтрэхэд ашиглана.",
-    en: "* We don't collect names or contact details. Your email is used only for login.",
-    ja: "* 名前や連絡先はいただきません。メールアドレスはログインにのみ使います。",
-  },
   "가입하고 취향 고르기": { vi: "Đăng ký và chọn sở thích", zh: "注册并选择喜好", mn: "Бүртгүүлж сонирхлоо сонгох", en: "Sign up and pick your interests", ja: "登録して好みを選ぶ" },
 
   // ── N2 취향 ──
@@ -123,7 +81,6 @@ export const messages = {
     en: "Your picks shape your recommendations first.\nYou can change them anytime.",
     ja: "選んだ好みはおすすめに優先して反映されます。\nあとからいつでも変更できます。",
   },
-  "가고 싶은 곳 (여러 개 선택)": { vi: "Nơi muốn đến (chọn nhiều)", zh: "想去的地方（可多选）", mn: "Очмоор байгаа газар (олныг сонгож болно)", en: "Places to visit (choose several)", ja: "行きたい場所（複数選択）" },
   "관심 있는 이야기": { vi: "Câu chuyện bạn quan tâm", zh: "感兴趣的故事", mn: "Сонирхдог түүх", en: "Stories you're interested in", ja: "興味のある話" },
   "여행 성향": { vi: "Phong cách du lịch", zh: "旅行风格", mn: "Аяллын хэв маяг", en: "Travel style", ja: "旅のスタイル" },
   "역사·유적": { vi: "Lịch sử · Di tích", zh: "历史·遗迹", mn: "Түүх · Дурсгалт газар", en: "History & Heritage", ja: "歴史・史跡" },
@@ -144,13 +101,11 @@ export const messages = {
   "혼자": { vi: "Một mình", zh: "独自", mn: "Ганцаараа", en: "Solo", ja: "ひとりで" },
   "함께": { vi: "Cùng nhau", zh: "结伴", mn: "Хамтдаа", en: "Together", ja: "一緒に" },
   "완료": { vi: "Xong", zh: "完成", mn: "Дуусгах", en: "Done", ja: "完了" },
-  "건너뛰기": { vi: "Bỏ qua", zh: "跳过", mn: "Алгасах", en: "Skip", ja: "スキップ" },
 
   // ── 03 지금 ──
   "지금, {area} 근처": { vi: "Bây giờ, gần {area}", zh: "现在，{area}附近", mn: "Одоо, {area}-ийн ойролцоо", en: "Now, near {area}", ja: "今、{area}の近く" },
   "지금 가기 좋은 곳": { vi: "Nơi nên đến lúc này", zh: "现在适合去的地方", mn: "Одоо очиход тохиромжтой газар", en: "Good places to go now", ja: "今行くのにおすすめの場所" },
   "장소 사진 (TourAPI)": { vi: "Ảnh địa điểm (TourAPI)", zh: "地点照片（TourAPI）", mn: "Газрын зураг (TourAPI)", en: "Place photo (TourAPI)", ja: "場所の写真（TourAPI）" },
-  "장면 보기": { vi: "Xem cảnh", zh: "查看场景", mn: "Үзэгдэл харах", en: "View scene", ja: "シーンを見る" },
   "지난주 유학생 인기": { vi: "Được du học sinh yêu thích tuần trước", zh: "上周留学生热门", mn: "Өнгөрсөн долоо хоногт оюутнуудын дуртай газар", en: "Popular with students last week", ja: "先週の留学生に人気" },
   "유학생 {count}명": { vi: "{count} du học sinh", zh: "{count}名留学生", mn: "{count} оюутан", en: "{count} students", ja: "留学生{count}人" },
   "지금 보이는 걸 찍어서 물어보기": { vi: "Chụp điều bạn đang thấy và hỏi", zh: "拍下眼前所见来提问", mn: "Харж буй зүйлээ зураг авч асуух", en: "Take a photo of what you see and ask", ja: "今見えているものを撮って質問する" },
@@ -177,15 +132,7 @@ export const messages = {
   "사진 다시 찍기": { vi: "Chụp lại ảnh", zh: "重新拍照", mn: "Дахин зураг авах", en: "Retake photo", ja: "写真を撮り直す" },
   "사진 찍기": { vi: "Chụp ảnh", zh: "拍照", mn: "Зураг авах", en: "Take a photo", ja: "写真を撮る" },
   "방금 찍은 사진": { vi: "Ảnh vừa chụp", zh: "刚拍的照片", mn: "Саяын авсан зураг", en: "Photo you just took", ja: "今撮った写真" },
-  "눌러서 사진 찍기": { vi: "Chạm để chụp ảnh", zh: "点按拍照", mn: "Дарж зураг авах", en: "Tap to take a photo", ja: "タップして写真を撮る" },
   "이 사진은 어디인가요?": { vi: "Ảnh này ở đâu?", zh: "这张照片是在哪里？", mn: "Энэ зураг хаана вэ?", en: "Where is this photo from?", ja: "この写真はどこですか？" },
-  "근처 장소 중에서 골라주세요 · 위치는 저장하지 않아요": {
-    vi: "Hãy chọn trong các địa điểm gần đây · Vị trí không được lưu",
-    zh: "请从附近地点中选择 · 不会保存你的位置",
-    mn: "Ойролцоох газруудаас сонгоно уу · Байршлыг хадгалахгүй",
-    en: "Choose from nearby places · Your location isn't saved",
-    ja: "近くの場所から選んでください · 位置情報は保存しません",
-  },
   "사진 속 장소": { vi: "Địa điểm trong ảnh", zh: "照片中的地点", mn: "Зураг дээрх газар", en: "Place in the photo", ja: "写真の場所" },
   "여기 없어요": { vi: "Không có ở đây", zh: "这里没有", mn: "Энд алга", en: "Not listed here", ja: "ここにありません" },
   "직접 검색해서 골랐어요": { vi: "Bạn đã tự tìm và chọn", zh: "已通过搜索选择", mn: "Өөрөө хайж сонгосон", en: "Chosen from search", ja: "検索して選びました" },
@@ -199,7 +146,6 @@ export const messages = {
   "내가 찍은 사진": { vi: "Ảnh tôi đã chụp", zh: "我拍的照片", mn: "Миний авсан зураг", en: "My photo", ja: "自分で撮った写真" },
   "저장된 해설": { vi: "Thuyết minh đã lưu", zh: "已存讲解", mn: "Хадгалсан тайлбар", en: "Saved guide", ja: "保存された解説" },
   "{language}로 번역": { vi: "Dịch sang {language}", zh: "翻译成{language}", mn: "{language} руу орчуулсан", en: "Translated to {language}", ja: "{language}に翻訳" },
-  "도장": { vi: "Con dấu", zh: "印章", mn: "Тамга", en: "Stamp", ja: "スタンプ" },
   "방문 도장 획득!": { vi: "Đã nhận con dấu ghé thăm!", zh: "获得到访印章！", mn: "Зочилсон тамга авлаа!", en: "Visit stamp earned!", ja: "訪問スタンプ獲得！" },
   "한걸음 남기기": { vi: "Để lại một bước chân", zh: "留下一步", mn: "Нэг алхам үлдээх", en: "Leave a One Step", ja: "ひとあしを残す" },
   "다음: {place} {walk}": { vi: "Tiếp theo: {place} {walk}", zh: "下一站：{place} {walk}", mn: "Дараагийнх: {place} {walk}", en: "Next: {place} {walk}", ja: "次：{place} {walk}" },
@@ -240,7 +186,6 @@ export const messages = {
   "사진 바꾸기": { vi: "Đổi ảnh", zh: "更换照片", mn: "Зураг солих", en: "Change photo", ja: "写真を変更" },
   "사진 추가": { vi: "Thêm ảnh", zh: "添加照片", mn: "Зураг нэмэх", en: "Add photo", ja: "写真を追加" },
   "첨부한 사진": { vi: "Ảnh đính kèm", zh: "已添加的照片", mn: "Хавсаргасан зураг", en: "Attached photo", ja: "添付した写真" },
-  "+ 사진": { vi: "+ Ảnh", zh: "+ 照片", mn: "+ Зураг", en: "+ Photo", ja: "+ 写真" },
   "보는 사람의 언어로 자동 번역돼요 · 원문 언어가 함께 표시돼요": {
     vi: "Tự động dịch sang ngôn ngữ của người xem · Ngôn ngữ gốc cũng được hiển thị",
     zh: "将自动翻译成查看者的语言 · 同时显示原文语言",
@@ -282,17 +227,6 @@ export const messages = {
 
   // ── 09 엽서 만들기 ──
   "회고 엽서 만들기": { vi: "Tạo bưu thiếp hồi tưởng", zh: "制作回顾明信片", mn: "Дурсамжийн ил захидал хийх", en: "Make a memory postcard", ja: "振り返りはがきを作る" },
-  "사진 4장 고르기": { vi: "Chọn 4 ảnh", zh: "选择4张照片", mn: "4 зураг сонгох", en: "Choose 4 photos", ja: "写真を4枚選ぶ" },
-  "사진{n}": { vi: "Ảnh {n}", zh: "照片{n}", mn: "Зураг {n}", en: "Photo {n}", ja: "写真{n}" },
-  "선택됨": { vi: "Đã chọn", zh: "已选择", mn: "Сонгосон", en: "Selected", ja: "選択済み" },
-  "선택 안 됨": { vi: "Chưa chọn", zh: "未选择", mn: "Сонгоогүй", en: "Not selected", ja: "未選択" },
-  "+ 오늘 찍은 사진 {count}장 중에서 선택": {
-    vi: "+ Chọn trong {count} ảnh chụp hôm nay",
-    zh: "+ 从今天拍摄的{count}张照片中选择",
-    mn: "+ Өнөөдөр авсан {count} зургаас сонгох",
-    en: "+ Choose from {count} photos taken today",
-    ja: "+ 今日撮った{count}枚から選ぶ",
-  },
   "오늘 어땠어요?": { vi: "Hôm nay thế nào?", zh: "今天过得怎么样？", mn: "Өнөөдөр ямар байв?", en: "How was today?", ja: "今日はどうでしたか？" },
   "오늘 느낀 걸 내 언어로 적어 보세요": {
     vi: "Hãy viết cảm nhận hôm nay bằng ngôn ngữ của bạn",
@@ -301,28 +235,9 @@ export const messages = {
     en: "Write how you felt today in your own language",
     ja: "今日感じたことを自分の言語で書いてみましょう",
   },
-  "그림체": { vi: "Phong cách vẽ", zh: "画风", mn: "Зургийн хэв маяг", en: "Art style", ja: "画風" },
-  "수채화": { vi: "Màu nước", zh: "水彩", mn: "Усан будаг", en: "Watercolor", ja: "水彩" },
-  "웹툰": { vi: "Webtoon", zh: "网络漫画", mn: "Вэбтүн", en: "Webtoon", ja: "ウェブトゥーン" },
-  "연필 스케치": { vi: "Phác họa bút chì", zh: "铅笔素描", mn: "Харандаан зураг", en: "Pencil sketch", ja: "鉛筆スケッチ" },
-  "빈티지 엽서": { vi: "Bưu thiếp cổ điển", zh: "复古明信片", mn: "Хуучны ил захидал", en: "Vintage postcard", ja: "ビンテージはがき" },
-  "만드는 데 {seconds}초쯤 걸려요 · 다른 화면에 가 있어도 돼요": {
-    vi: "Mất khoảng {seconds} giây · Bạn có thể sang màn hình khác",
-    zh: "大约需要{seconds}秒 · 可以先去其他页面",
-    mn: "Ойролцоогоор {seconds} секунд болно · Өөр дэлгэц рүү шилжиж болно",
-    en: "Takes about {seconds} seconds · You can leave this screen",
-    ja: "約{seconds}秒かかります · 他の画面に移動しても大丈夫です",
-  },
   "엽서 만들기": { vi: "Tạo bưu thiếp", zh: "制作明信片", mn: "Ил захидал хийх", en: "Make postcard", ja: "はがきを作る" },
 
   // ── 10 엽서 결과 ──
-  "아직 저장할 엽서 이미지가 없어요 (생성 API 연동 전)": {
-    vi: "Chưa có ảnh bưu thiếp để lưu (chưa kết nối API tạo ảnh)",
-    zh: "还没有可保存的明信片图片（尚未接入生成 API）",
-    mn: "Хадгалах ил захидлын зураг алга (үүсгэх API холбогдоогүй)",
-    en: "No postcard image to save yet (generation API not connected)",
-    ja: "保存できるはがき画像がまだありません（生成API連携前）",
-  },
   "이미지를 저장하지 못했어요. 다시 시도해 주세요.": {
     vi: "Không thể lưu ảnh. Vui lòng thử lại.",
     zh: "图片保存失败，请重试。",
@@ -340,13 +255,6 @@ export const messages = {
   },
   "완성됐어요": { vi: "Đã hoàn thành", zh: "已完成", mn: "Бэлэн боллоо", en: "All done", ja: "完成しました" },
   "엽서를 그리는 중…": { vi: "Đang vẽ bưu thiếp…", zh: "正在绘制明信片…", mn: "Ил захидал зурж байна…", en: "Drawing your postcard…", ja: "はがきを描いています…" },
-  "AI 생성 엽서 (사진 {count}장 + 소감 + {style})": {
-    vi: "Bưu thiếp do AI tạo ({count} ảnh + cảm nhận + {style})",
-    zh: "AI 生成明信片（{count}张照片 + 感想 + {style}）",
-    mn: "AI-ийн үүсгэсэн ил захидал ({count} зураг + сэтгэгдэл + {style})",
-    en: "AI-generated postcard ({count} photos + note + {style})",
-    ja: "AI生成はがき（写真{count}枚 + 感想 + {style}）",
-  },
   "흔적 지도에 공유": { vi: "Chia sẻ lên bản đồ dấu chân", zh: "分享到足迹地图", mn: "Мөрийн зурагт хуваалцах", en: "Share to Footprint Map", ja: "足跡マップに共有" },
   "이미지 저장": { vi: "Lưu ảnh", zh: "保存图片", mn: "Зураг хадгалах", en: "Save image", ja: "画像を保存" },
 
@@ -363,20 +271,6 @@ export const messages = {
 
   // ── 로그인·가입 ──
   "로그인": { vi: "Đăng nhập", zh: "登录", mn: "Нэвтрэх", en: "Log in", ja: "ログイン" },
-  "아이디·비밀번호로 시작해요 · 연락처는 받지 않아요": {
-    vi: "Bắt đầu bằng ID và mật khẩu · Không thu thập thông tin liên hệ",
-    zh: "使用账号和密码开始 · 不收集联系方式",
-    mn: "ID, нууц үгээр эхэлнэ · Холбоо барих мэдээлэл авахгүй",
-    en: "Start with an ID and password · We don't collect contact details",
-    ja: "IDとパスワードで始めます · 連絡先はいただきません",
-  },
-  "가입하면 선호하는 관광지 · 관심사 · 성향을 골라 추천에 바로 반영할 수 있어요.": {
-    vi: "Khi đăng ký, bạn có thể chọn địa điểm yêu thích, mối quan tâm và phong cách để áp dụng ngay vào gợi ý.",
-    zh: "注册后可选择喜欢的景点、兴趣和旅行风格，并立即体现在推荐中。",
-    mn: "Бүртгүүлбэл дуртай газар, сонирхол, аяллын хэв маягаа сонгож, санал болголтод шууд тусгаж болно.",
-    en: "Sign up to pick your favorite spots, interests, and style and apply them to recommendations right away.",
-    ja: "登録すると、好みの観光地・関心・スタイルを選んで、おすすめにすぐ反映できます。",
-  },
   "아이디": { vi: "ID", zh: "账号", mn: "ID", en: "ID", ja: "ID" },
   "영문 소문자·숫자·_ 4~20자": {
     vi: "4–20 ký tự: chữ thường, số, _",
@@ -384,21 +278,6 @@ export const messages = {
     mn: "4–20 тэмдэгт: жижиг латин үсэг, тоо, _",
     en: "4–20 characters: lowercase letters, numbers, _",
     ja: "英小文字・数字・_ の4〜20文字",
-  },
-  "이름": { vi: "Tên", zh: "名字", mn: "Нэр", en: "Name", ja: "名前" },
-  "화면에 보일 이름 (20자 이내)": {
-    vi: "Tên hiển thị (tối đa 20 ký tự)",
-    zh: "显示名称（20字以内）",
-    mn: "Харагдах нэр (20 тэмдэгт хүртэл)",
-    en: "Display name (up to 20 characters)",
-    ja: "表示名（20文字以内）",
-  },
-  "* 아이디는 가입 뒤 바꿀 수 없어요. 연락처는 받지 않아요.": {
-    vi: "* Không thể đổi ID sau khi đăng ký. Chúng tôi không thu thập thông tin liên hệ.",
-    zh: "* 注册后无法更改账号。不收集联系方式。",
-    mn: "* Бүртгүүлсний дараа ID-г өөрчлөх боломжгүй. Холбоо барих мэдээлэл авахгүй.",
-    en: "* Your ID can't be changed after signing up. We don't collect contact details.",
-    ja: "* IDは登録後に変更できません。連絡先はいただきません。",
   },
   "아이디는 영문 소문자·숫자·_ 4~20자로 써 주세요": {
     vi: "ID gồm 4–20 ký tự: chữ thường, số, _",
@@ -414,7 +293,6 @@ export const messages = {
     en: "Password must be at least 8 characters",
     ja: "パスワードは8文字以上で入力してください",
   },
-  "이름을 써 주세요": { vi: "Vui lòng nhập tên", zh: "请输入名字", mn: "Нэрээ бичнэ үү", en: "Please enter your name", ja: "名前を入力してください" },
   "이미 쓰는 아이디예요": { vi: "ID này đã được dùng", zh: "该账号已被使用", mn: "Энэ ID ашиглагдаж байна", en: "This ID is already taken", ja: "このIDはすでに使われています" },
   "이미 쓰는 아이디예요. 가입 화면에서 바꿔 주세요.": {
     vi: "ID này đã được dùng. Vui lòng đổi ở màn hình đăng ký.",
@@ -424,13 +302,6 @@ export const messages = {
     ja: "このIDはすでに使われています。登録画面で変更してください。",
   },
   "확인하는 중…": { vi: "Đang kiểm tra…", zh: "确认中…", mn: "Шалгаж байна…", en: "Checking…", ja: "確認中…" },
-  "가입을 마치면 바로 시작해요": {
-    vi: "Đăng ký xong là bắt đầu ngay",
-    zh: "完成注册后立即开始",
-    mn: "Бүртгэл дуусмагц шууд эхэлнэ",
-    en: "You'll start right after signing up",
-    ja: "登録が終わるとすぐに始まります",
-  },
   "아이디 또는 비밀번호가 맞지 않습니다.": {
     vi: "ID hoặc mật khẩu không đúng.",
     zh: "账号或密码不正确。",
@@ -450,7 +321,7 @@ export const messages = {
   // ── 03 지금 ──
   "{station}역": { vi: "Ga {station}", zh: "{station}站", mn: "{station} буудал", en: "{station} Station", ja: "{station}駅" },
   "서대문": { vi: "Seodaemun", zh: "西大门", mn: "Сөдэмүн", en: "Seodaemun", ja: "西大門" },
-  "{when} · {weather} 추천이에요": {
+  "{when} · {weather} 추천해요": {
     vi: "{when} · Gợi ý cho {weather}",
     zh: "{when} · {weather}的推荐",
     mn: "{when} · {weather} санал болголт",
@@ -464,12 +335,8 @@ export const messages = {
   "맑은 날": { vi: "ngày nắng", zh: "晴天", mn: "цэлмэг өдөр", en: "a clear day", ja: "晴れの日" },
   "비 오는 날": { vi: "ngày mưa", zh: "雨天", mn: "бороотой өдөр", en: "a rainy day", ja: "雨の日" },
   "눈 오는 날": { vi: "ngày tuyết", zh: "雪天", mn: "цастай өдөр", en: "a snowy day", ja: "雪の日" },
-  "맑음": { vi: "Nắng", zh: "晴", mn: "Цэлмэг", en: "Clear", ja: "晴れ" },
-  "비": { vi: "Mưa", zh: "雨", mn: "Бороо", en: "Rain", ja: "雨" },
-  "눈": { vi: "Tuyết", zh: "雪", mn: "Цас", en: "Snow", ja: "雪" },
   "도보 {minutes}분": { vi: "Đi bộ {minutes} phút", zh: "步行{minutes}分钟", mn: "Явганаар {minutes} мин", en: "{minutes} min walk", ja: "徒歩{minutes}分" },
   "{minutes}분": { vi: "{minutes} phút", zh: "{minutes}分钟", mn: "{minutes} мин", en: "{minutes} min", ja: "{minutes}分" },
-  "실내": { vi: "Trong nhà", zh: "室内", mn: "Дотор", en: "Indoors", ja: "屋内" },
 
   // ── 04 장면 · 06 해설·도장 ──
   "장면을 만들고 있어요…": { vi: "Đang tạo cảnh…", zh: "正在生成场景…", mn: "Үзэгдэл бэлтгэж байна…", en: "Creating your scene…", ja: "シーンを作成中…" },
@@ -524,6 +391,40 @@ export const messages = {
     en: "Couldn't make your postcard. Please try again.",
     ja: "はがきを作成できませんでした。もう一度作成してください。",
   },
+  // ── ui_final 추가 ──
+  "가고 싶은 곳": { vi: "Nơi muốn đến", zh: "想去的地方", mn: "Очмоор байгаа газар", en: "Places to visit", ja: "行きたい場所" },
+  "근처 장소 중에서 골라주세요": { vi: "Hãy chọn trong các địa điểm gần đây", zh: "请从附近地点中选择", mn: "Ойролцоох газруудаас сонгоно уу", en: "Choose from nearby places", ja: "近くの場所から選んでください" },
+  "사진 1장 고르기": { vi: "Chọn 1 ảnh", zh: "选择1张照片", mn: "1 зураг сонгох", en: "Choose 1 photo", ja: "写真を1枚選ぶ" },
+  "만드는 데 {seconds}초 정도 걸려요": { vi: "Mất khoảng {seconds} giây", zh: "大约需要{seconds}秒", mn: "Ойролцоогоор {seconds} секунд болно", en: "Takes about {seconds} seconds", ja: "約{seconds}秒かかります" },
+  "취향을 알려주세요": { vi: "Hãy cho biết sở thích của bạn", zh: "告诉我们你的喜好", mn: "Сонирхлоо хэлээрэй", en: "Tell us what you like", ja: "好みを教えてください" },
+  "나라와 언어를 골라주세요": { vi: "Hãy chọn quốc gia và ngôn ngữ", zh: "请选择国家和语言", mn: "Улс, хэлээ сонгоно уу", en: "Choose your country and language", ja: "国と言語を選んでください" },
+  "영국": { vi: "Anh", zh: "英国", mn: "Их Британи", en: "United Kingdom", ja: "イギリス" },
+  "프랑스": { vi: "Pháp", zh: "法国", mn: "Франц", en: "France", ja: "フランス" },
+  "중복확인": { vi: "Kiểm tra", zh: "查重", mn: "Шалгах", en: "Check", ja: "重複確認" },
+  "쓸 수 있는 아이디예요": { vi: "ID này có thể dùng", zh: "该账号可以使用", mn: "Энэ ID-г ашиглах боломжтой", en: "This ID is available", ja: "このIDは使えます" },
+  "가입 단계": { vi: "Bước đăng ký", zh: "注册步骤", mn: "Бүртгэлийн алхам", en: "Sign-up step", ja: "登録ステップ" },
+  "이미지를 업로드하세요": { vi: "Hãy tải ảnh lên", zh: "请上传图片", mn: "Зураг байршуулна уу", en: "Upload an image", ja: "画像をアップロードしてください" },
+  "{country} 유학생 {count}명 다녀감": { vi: "{count} du học sinh {country} đã đến", zh: "{count}名{country}留学生来过", mn: "{country}-ын {count} оюутан очсон", en: "{count} students from {country} visited", ja: "{country}の留学生{count}人が訪問" },
+  "나의 발자취": { vi: "Dấu chân của tôi", zh: "我的足迹", mn: "Миний мөр", en: "My Footprints", ja: "わたしの足跡" },
+  "서대문에서 보낸 {period}": { vi: "{period} ở Seodaemun", zh: "在西大门度过的{period}", mn: "Сөдэмүнд өнгөрүүлсэн {period}", en: "{period} in Seodaemun", ja: "西大門で過ごした{period}" },
+  "{count}개월": { vi: "{count} tháng", zh: "{count}个月", mn: "{count} сар", en: "{count} months", ja: "{count}か月" },
+  "{count}일": { vi: "{count} ngày", zh: "{count}天", mn: "{count} өдөр", en: "{count} days", ja: "{count}日" },
+  "{name}의 발자취": { vi: "Dấu chân của {name}", zh: "{name}的足迹", mn: "{name}-ийн мөр", en: "{name}'s footprints", ja: "{name}の足跡" },
+  "{count}곳": { vi: "{count} nơi", zh: "{count}处", mn: "{count} газар", en: "{count} places", ja: "{count}か所" },
+  "{count}개": { vi: "{count}", zh: "{count}个", mn: "{count}", en: "{count}", ja: "{count}個" },
+  "완주 코스": { vi: "Hành trình hoàn thành", zh: "完成的路线", mn: "Дуусгасан маршрут", en: "Courses done", ja: "完走コース" },
+  "남긴 한걸음": { vi: "Bước chân đã để lại", zh: "留下的一步", mn: "Үлдээсэн алхам", en: "Steps left", ja: "残したひとあし" },
+  "나의 이야기": { vi: "Câu chuyện của tôi", zh: "我的故事", mn: "Миний түүх", en: "My story", ja: "わたしの物語" },
+  "학교와 집만 알던 날부터, 서대문의 {count}곳을 걸었어요.": { vi: "Từ những ngày chỉ biết trường và nhà, bạn đã bước qua {count} nơi ở Seodaemun.", zh: "从只知道学校和家的日子起，你已走过西大门的{count}个地方。", mn: "Зөвхөн сургууль, гэрээ мэддэг байсан өдрөөс хойш та Сөдэмүний {count} газраар алхжээ.", en: "From the days you only knew school and home, you have walked through {count} places in Seodaemun.", ja: "学校と家しか知らなかった日から、西大門の{count}か所を歩きました。" },
+  "이 동네는 이제 당신의 이야기가 되었어요.": { vi: "Khu phố này giờ đã trở thành câu chuyện của bạn.", zh: "这个街区如今成了你的故事。", mn: "Энэ хороолол одоо таны түүх болжээ.", en: "This neighborhood is now your story.", ja: "この街は今、あなたの物語になりました。" },
+  "내가 남긴 순간들": { vi: "Những khoảnh khắc tôi để lại", zh: "我留下的瞬间", mn: "Миний үлдээсэн агшнууд", en: "Moments I left", ja: "わたしが残した瞬間" },
+  "첫 도장 · {place}": { vi: "Con dấu đầu tiên · {place}", zh: "第一枚印章 · {place}", mn: "Анхны тамга · {place}", en: "First stamp · {place}", ja: "初めてのスタンプ · {place}" },
+  "첫 한걸음 · {place}": { vi: "Bước chân đầu tiên · {place}", zh: "第一步 · {place}", mn: "Анхны алхам · {place}", en: "First step · {place}", ja: "初めてのひとあし · {place}" },
+  "{course} 완주": { vi: "Hoàn thành {course}", zh: "完成{course}", mn: "{course} дуусгасан", en: "{course} completed", ja: "{course}完走" },
+  "한 줄 남기기": { vi: "Để lại một dòng", zh: "留下一句话", mn: "Нэг мөр үлдээх", en: "Leave a line", ja: "ひとこと残す" },
+  "아직 남긴 순간이 없어요": { vi: "Chưa có khoảnh khắc nào", zh: "还没有留下瞬间", mn: "Үлдээсэн агшин алга", en: "No moments yet", ja: "まだ残した瞬間がありません" },
+  "저장": { vi: "Lưu", zh: "保存", mn: "Хадгалах", en: "Save", ja: "保存" },
+  "이 여정을 한 줄로 남겨보세요": { vi: "Hãy để lại một dòng về hành trình này", zh: "用一句话记录这段旅程", mn: "Энэ аяллаа нэг мөрөөр үлдээгээрэй", en: "Sum up this journey in one line", ja: "この旅をひとことで残してみましょう" },
 } as const satisfies Record<string, Translations>;
 
 export type MsgKey = keyof typeof messages;

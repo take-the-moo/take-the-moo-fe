@@ -16,29 +16,29 @@ export function Screen({ className, children }: Props) {
   );
 }
 
-// Figma: body 프레임 (좌우 20, 상하 12, 간격 14). 간격을 바꿀 땐 `gap-3!`처럼 !를 붙인다 (cn은 병합하지 않음).
+// Figma: body 프레임 (좌우 24). 간격을 바꿀 땐 `gap-3!`처럼 !를 붙인다 (cn은 병합하지 않음).
 export function ScreenBody({ className, children }: Props) {
-  return <div className={cn("flex flex-1 flex-col gap-3.5 px-5 py-3", className)}>{children}</div>;
+  return <div className={cn("flex flex-1 flex-col gap-6 px-6 py-3", className)}>{children}</div>;
 }
 
-// Figma: footer 프레임 (좌우 20, 상하 16, 간격 10) — 주 버튼 영역. 버튼 두 개를 가로로 놓을 땐 `flex-row!`.
+// Figma: footer 프레임 (좌우 24) — 주 버튼 영역. 버튼 두 개를 가로로 놓을 땐 `flex-row!`.
 export function ScreenFooter({ className, children }: Props) {
   return (
-    <div className={cn("sticky bottom-0 flex flex-col gap-2.5 bg-surface px-5 py-4", className)}>{children}</div>
+    <div className={cn("sticky bottom-0 flex flex-col gap-3 bg-surface px-6 pt-3 pb-4", className)}>{children}</div>
   );
 }
 
-// Figma: 섹션 제목 (16px Bold)
+// Figma: 섹션 제목 (16px Bold, Gray 700)
 export function SectionTitle({ className, children }: Props) {
-  return <h2 className={cn("text-body-lg font-bold text-fg", className)}>{children}</h2>;
+  return <h2 className={cn("text-body-lg font-bold text-fg-sub", className)}>{children}</h2>;
 }
 
-// Figma: 탭 화면(03·07·08)의 대제목 + 부제 (22px Bold / 13px, 간격 4)
+// Figma: 탭 화면(03·08)의 대제목 + 부제 (26px Bold / 14px)
 export function ScreenHeading({ title, sub }: { title: string; sub?: string }) {
   return (
-    <div className="flex flex-col gap-1 leading-[1.45]">
-      <h1 className="text-heading font-bold text-ink">{title}</h1>
-      {sub && <p className="text-label text-fg-caption">{sub}</p>}
+    <div className="flex flex-col gap-2.5">
+      <h1 className="text-heading font-bold text-fg">{title}</h1>
+      {sub && <p className="text-body font-medium text-fg-muted">{sub}</p>}
     </div>
   );
 }

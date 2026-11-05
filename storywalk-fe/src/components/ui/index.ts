@@ -1,13 +1,12 @@
 export { Button } from "./Button";
 export { Chip, ChipGroup } from "./Chip";
-export { TopBar } from "./TopBar";
+export { TopBar, StepBar } from "./TopBar";
 export { TabBar } from "./TabBar";
-export { ImagePlaceholder } from "./ImagePlaceholder";
+export { ImagePlaceholder, UploadPlaceholder } from "./ImagePlaceholder";
 export { InfoBox, Card } from "./Box";
 export { Screen, ScreenBody, ScreenFooter, ScreenHeading, SectionTitle } from "./Screen";
 export { TextField, TextArea, FieldLabel } from "./Field";
 export { CheckCircle } from "./CheckCircle";
 export { OptionRow } from "./OptionRow";
-export { BottomSheet } from "./BottomSheet";
 export { PeekSheet } from "./PeekSheet";
-export { Divider } from "./Divider";
+export { Stamp } from "./Stamp";

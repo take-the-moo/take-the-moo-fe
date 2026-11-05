@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { placesApi } from "@/api/places";
 import type { MapPin } from "@/api/types";
-import { Button, ImagePlaceholder, OptionRow, Screen, ScreenBody, ScreenFooter, TextField, TopBar } from "@/components/ui";
+import { Button, ImagePlaceholder, OptionRow, Screen, ScreenBody, ScreenFooter, TextField, TopBar, UploadPlaceholder } from "@/components/ui";
 import { useCurrentLocation } from "@/hooks/useCurrentLocation";
 import { usePlaces } from "@/hooks/usePlaces";
 import { useT } from "@/i18n";
@@ -13,7 +13,7 @@ import { distanceLabel } from "@/lib/format";
 import { takePhoto } from "@/platform/camera";
 import { useCaptureStore, useLatestPhoto } from "@/store/capture";
 
-// 05 현장 해설 · 장소 확인 · F4 — Figma 1:436 (썸네일 0.6배를 390 기준으로 환산)
+// 05 현장 해설 · 장소 확인 · F4 — Figma 9:1344 (사진 전: 9:1361)
 // 사진만으로 장소를 추측하지 않고 사용자가 근처 장소 중에서 고른다(요구서 F4).
 // 근처 후보는 GET /places/nearby(위치 1회, 거부면 기본 역 기준). "여기 없어요"는 전체 장소 목록에서 이름으로 찾는다.
 // 고른 장소는 사진에 기록해 두었다가 사진을 올릴 때 placeId로 보낸다(엽서 제목의 장소).
@@ -59,12 +59,18 @@ export default function ExplainPage() {
   return (
     <Screen>
       <TopBar title={t("현장 해설")} />
-      <ScreenBody className="gap-2.5!">
-        <button type="button" onClick={retake} aria-label={photo ? t("사진 다시 찍기") : t("사진 찍기")} className="w-full">
-          <ImagePlaceholder label={photo ? t("방금 찍은 사진") : t("눌러서 사진 찍기")} src={photo?.url} className="h-[230px]" />
-        </button>
-        <h2 className="text-headline leading-[1.45] font-bold text-fg">{t("이 사진은 어디인가요?")}</h2>
-        <p className="text-caption leading-[1.45] text-fg-muted">{t("근처 장소 중에서 골라주세요 · 위치는 저장하지 않아요")}</p>
+      <button type="button" onClick={retake} aria-label={photo ? t("사진 다시 찍기") : t("사진 찍기")} className="block w-full shrink-0">
+        {photo ? (
+          <ImagePlaceholder label={t("방금 찍은 사진")} src={photo.url} className="h-[245px] rounded-none!" />
+        ) : (
+          <UploadPlaceholder className="h-[245px] rounded-none!" />
+        )}
+      </button>
+      <ScreenBody className="gap-5! py-5!">
+        <div className="flex flex-col gap-1.5 font-medium">
+          <h2 className="text-page text-fg">{t("이 사진은 어디인가요?")}</h2>
+          <p className="text-caption leading-[1.5] text-fg-muted">{t("근처 장소 중에서 골라주세요")}</p>
+        </div>
 
         <div role="radiogroup" aria-label={t("사진 속 장소")} className="flex flex-col gap-2.5">
           {nearby.isPending && <p className="px-1 text-caption text-fg-muted">{t("불러오는 중…")}</p>}

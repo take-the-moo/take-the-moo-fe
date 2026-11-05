@@ -76,8 +76,8 @@ function HomeView() {
     <Screen>
       <ScreenBody>
         <div className="flex flex-col gap-1">
-          <p className="text-[22px] font-bold leading-[1.45] text-ink">지금, 독립문역 근처</p>
-          <p className="text-label text-fg-muted">토요일 오후 · 비 오는 날 추천이에요</p>
+          <p className="text-[22px] font-bold leading-[1.45] text-fg">지금, 독립문역 근처</p>
+          <p className="text-body text-fg-muted">토요일 오후 · 비 오는 날 추천이에요</p>
         </div>
         <ChipGroup>
           <Chip>토 15:20</Chip>
@@ -88,7 +88,7 @@ function HomeView() {
         <Card>
           <ImagePlaceholder label="장소 사진 (TourAPI)" className="h-[104px]" />
           <p className="text-[18px] font-bold leading-[1.45] text-fg">서대문형무소역사관</p>
-          <p className="text-label text-fg-muted">비 오는 오후엔 실내 전시관부터 · 도보 4분</p>
+          <p className="text-body text-fg-muted">비 오는 오후엔 실내 전시관부터 · 도보 4분</p>
           <ChipGroup>
             <Chip>베트남 유학생 12명 다녀감</Chip>
             <Chip>독립 코스 1/3</Chip>

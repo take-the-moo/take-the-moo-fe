@@ -8,16 +8,17 @@ import { toApiLanguage } from "@/api/codes";
 import { placesApi } from "@/api/places";
 import { visitsApi } from "@/api/visits";
 import { courseStops, CourseSteps } from "@/components/course/CourseProgress";
-import { Button, Card, Chip, ChipGroup, ImagePlaceholder, Screen, ScreenBody, ScreenFooter, TopBar } from "@/components/ui";
+import { Button, Card, Chip, ChipGroup, ImagePlaceholder, Screen, ScreenBody, ScreenFooter, Stamp, TopBar } from "@/components/ui";
 import { usePlace } from "@/hooks/usePlaces";
 import { useLang, useT, type MsgKey } from "@/i18n";
 import { parseDate } from "@/lib/format";
-import { languageLabel } from "@/mocks/sample";
+import { languageLabel } from "@/lib/options";
+import { placeImage } from "@/lib/placeImage";
 import { getCurrentPosition } from "@/platform/location";
 import { useLatestPhoto } from "@/store/capture";
 import { useUserStore } from "@/store/user";
 
-// 06 해설 결과 · 방문 도장 · F4·F5 — Figma 1:466 (썸네일 0.6배를 390 기준으로 환산)
+// 06 해설 결과 · 방문 도장 · F4·F5 — Figma 9:1287
 // mode=explain: 05에서 장소를 고르고 온 경우 — 사진·저장된 해설(POST /explanations)·도장·코스 진행
 // mode=stamp:   04 "방문 완료"(트리거 9)로 온 경우 — 사진·해설 없이 도장 영역만 (v3.1 노트)
 // 도장은 들어오면 바로 POST /visits(현재 위치로 근접 검증, 기본 200m)를 부른다. 같은 날 다시 찍으면 서버가 alreadyStamped로 준다.
@@ -82,24 +83,26 @@ export default function VisitPage({ params, searchParams }: Props) {
   return (
     <Screen>
       <TopBar title={placeName} />
-      <ScreenBody className="gap-3!">
+      {explain && (
+        <ImagePlaceholder label={t("내가 찍은 사진")} src={photo?.url ?? placeImage(placeName, place?.imageUrl)} className="h-[245px] shrink-0 rounded-none!" />
+      )}
+      <ScreenBody className="gap-4! pt-5!">
         {explain && (
           <>
-            <ImagePlaceholder label={t("내가 찍은 사진")} src={photo?.url} className="h-[130px]" />
-            <ChipGroup>
+            <ChipGroup className="mb-2 gap-2!">
               <Chip selected>{t("저장된 해설")}</Chip>
               <Chip>{t("{language}로 번역", { language: t(languageLabel(language)) })}</Chip>
             </ChipGroup>
-            <Card className="gap-2! leading-[1.45]">
+            <Card className="text-body leading-[1.45] font-medium">
               {explanation.data ? (
                 <>
-                  <p className="text-body font-medium whitespace-pre-line text-ink">{explanation.data.text}</p>
+                  <p className="whitespace-pre-line text-fg">{explanation.data.text}</p>
                   {explanation.data.text !== explanation.data.original && (
-                    <p className="text-label whitespace-pre-line text-fg-caption">{explanation.data.original}</p>
+                    <p className="whitespace-pre-line text-fg-muted">{explanation.data.original}</p>
                   )}
                 </>
               ) : (
-                <p className="text-label text-fg-caption">
+                <p className="text-fg-muted">
                   {explanation.isError ? t("불러오지 못했어요. 잠시 후 다시 시도해 주세요.") : t("불러오는 중…")}
                 </p>
               )}
@@ -107,33 +110,32 @@ export default function VisitPage({ params, searchParams }: Props) {
           </>
         )}
 
-        <Card className="h-[100px] flex-row! items-center gap-3!">
-          <div className="flex size-16 shrink-0 items-center justify-center rounded-full border-[3px] border-dashed border-ink text-label font-bold text-ink">
-            {t("도장")}
+        <Card className="gap-6! px-4! pt-5! pb-[25px]!">
+          <div className="flex items-center gap-5">
+            <Stamp size={86} done={Boolean(stamp)} />
+            <div className="flex min-w-0 flex-1 flex-col gap-2">
+              <p className="text-headline font-bold text-fg">{t(stampText.title)}</p>
+              <p className="text-caption font-medium text-fg-muted">
+                {stamp ? `${stamp.placeName} · ${dateLabel(parseDate(stamp.visitedDate), lang)}` : stampText.sub && t(stampText.sub)}
+              </p>
+            </div>
           </div>
-          <div className="flex min-w-0 flex-1 flex-col gap-0.5 leading-[1.45]">
-            <p className="text-body-lg font-bold text-fg">{t(stampText.title)}</p>
-            <p className="truncate text-caption text-fg-muted">
-              {stamp ? `${stamp.placeName} · ${dateLabel(parseDate(stamp.visitedDate), lang)}` : stampText.sub && t(stampText.sub)}
-            </p>
-          </div>
+          {visit.isError && (
+            <Button variant="text" onClick={() => visit.refetch()} disabled={visit.isFetching}>
+              {t("다시 시도")}
+            </Button>
+          )}
+          {course && (
+            <div className="flex flex-col gap-3 rounded-control bg-surface-sunken p-4">
+              <p className="text-body font-bold text-fg">
+                {course.name} {course.visitedCount} / {course.totalCount}
+              </p>
+              <CourseSteps {...courseStops(course.stops)} />
+            </div>
+          )}
         </Card>
-        {visit.isError && (
-          <Button variant="text" onClick={() => visit.refetch()} disabled={visit.isFetching}>
-            {t("다시 시도")}
-          </Button>
-        )}
-
-        {course && (
-          <div className="flex flex-col gap-2 rounded-box bg-surface-sunken p-4">
-            <p className="text-label leading-[1.45] font-bold text-fg">
-              {course.name} {course.visitedCount} / {course.totalCount}
-            </p>
-            <CourseSteps {...courseStops(course.stops)} />
-          </div>
-        )}
       </ScreenBody>
-      <ScreenFooter className="flex-row!">
+      <ScreenFooter className="flex-row! gap-2!">
         {/* 트리거 11: 한걸음 남기기 → N3 / 트리거 12: 다음 장소 → 04 복귀 */}
         <Button variant="secondary" className="flex-1" onClick={() => router.push(`/visit/${placeId}/review`)}>
           {t("한걸음 남기기")}

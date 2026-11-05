@@ -39,7 +39,7 @@ export default function LoginPage() {
       <TopBar title={t("로그인")} />
       <form onSubmit={submit} className="flex flex-1 flex-col">
         <ScreenBody>
-          <h2 className="text-heading leading-[30px] font-bold text-ink">{t("서대문 발자취")}</h2>
+          <h2 className="text-heading leading-[30px] font-bold text-fg">{t("풋노트")}</h2>
           <FieldLabel htmlFor="loginId">{t("아이디")}</FieldLabel>
           <TextField
             id="loginId"
@@ -67,7 +67,7 @@ export default function LoginPage() {
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
                 aria-pressed={showPassword}
-                className="shrink-0 text-label text-fg-sub"
+                className="shrink-0 text-body text-fg-sub"
               >
                 {showPassword ? t("숨기기") : t("보기")}
               </button>

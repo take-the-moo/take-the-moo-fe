@@ -5,12 +5,12 @@
 ## 1. 문서와 디자인 참조
 
 - [기획안·요구사항 v2](../../요구서.md): 서비스 범위, F1~F7, 비기능 요구사항, P0 API의 기준. 프로젝트 상위 디렉터리에 있으며 프런트엔드 폴더만 복사하면 링크 대상도 별도로 제공해야 한다.
-- [Figma 디자인 — ui_ref](https://www.figma.com/design/LiOMcefG48DP23YjkXeLgg/Untitled?node-id=0-1&t=5vN8C4Fc3uBkVfOp-1): 화면 및 사용자 흐름의 참조.
+- [Figma 디자인 — ui_final](https://www.figma.com/design/LiOMcefG48DP23YjkXeLgg/Untitled?node-id=9-268): 화면·비주얼의 기준. `ui_ref`(0:1 페이지)는 이전 와이어프레임이다.
 - [하네스 엔지니어링](HARNESS_ENGINEERING.md): 개발자·에이전트의 작업 규칙과 검증 기준.
 - [도보 경로안내 — 백엔드 전달](ROUTE_GUIDANCE_BACKEND.md): 경로 조회 API와 서버 처리 로직에 대한 미구현 협의안.
 - [루트 AGENTS.md](../AGENTS.md): Next.js 변경 전 설치된 버전의 문서를 확인하도록 하는 필수 작업 지침.
 
-Figma는 `0:1` 페이지의 메타데이터에서 `사용자 플로우 v3.1` 및 화면 이름을 확인했다. 픽셀 단위 디자인·컴포넌트 속성까지 검증한 문서는 아니다. 디자인에 있는 화면이 코드에 구현되어 있음을 뜻하지 않는다.
+화면은 Figma `ui_final` 페이지(9:268)의 402px 프레임을 기준으로 구현했다.
 
 ## 2. 서비스 개요와 범위
 
@@ -20,13 +20,13 @@ Figma는 `0:1` 페이지의 메타데이터에서 `사용자 플로우 v3.1` 및
 
 ## 3. 현재 구현 현황
 
-Figma ui_ref(사용자 플로우 v3.1)의 13개 화면을 **화면 단위로 구현**했고(2026-11-06), BE `docs/api.md` 기준으로 P0 API에 연동했다. 화면 디자인은 그대로 두고 데이터만 API로 바꿨다.
+Figma ui_final의 화면을 구현했고(2026-11-06), BE `docs/api.md` 기준으로 P0 API에 연동했다.
 
 | 화면 (Figma) | 경로 | 연동 API |
 | --- | --- | --- |
-| 00 시작 선택 | `/start` | 로그인 전이면 Providers가 보냄. 가입하기 → N1, 로그인 → `/login` |
+| 00 온보딩·시작 선택 | `/start` | 로그인 전이면 Providers가 보냄. 로고 1.5초 뒤 시작 화면. 가입하기 → N1, 로그인 → `/login` (로그인 링크는 Figma에 없지만 기존 사용자용으로 유지) |
 | 로그인 | `/login` | `POST /auth/login` (N1과 같은 구성요소로 추가한 화면) |
-| N1 가입 | `/signup` | 아이디·비밀번호·이름 입력, `GET /auth/check-id`. 입력은 `store/signup.ts`(메모리) |
+| N1 가입 | `/signup` | 아이디·비밀번호 입력, `GET /auth/check-id`. 서버 필수값 name에는 아이디를 넣는다. 입력은 `store/signup.ts`(메모리) |
 | N2 취향 선택 | `/preferences` | 서버 계약 없음, 기기에만 저장 |
 | 01 처음 설정 | `/setup` | 국적·언어와 함께 `POST /auth/signup` → 토큰 저장 |
 | 03 지금 (홈) | `/` | 위치 1회 → `GET /now`. 시연용 `?weather=RAINY&time=15:00&stationId=` 전달 |
@@ -36,14 +36,16 @@ Figma ui_ref(사용자 플로우 v3.1)의 13개 화면을 **화면 단위로 구
 | N3 한걸음 작성 | `/visit/[placeId]/review` | `POST /photos` → `POST /places/{id}/reviews`(JSON), 422 `REVIEW_INAPPROPRIATE` |
 | 07 흔적 지도 | `/map` | `GET /map/pins`(국적 필터는 화면에서 계산), `GET /places/{id}/reviews` |
 | 08 나의 기록 | `/log` | `GET /users/{userId}/visits` |
-| 09·10 회고 엽서 | `/postcard`, `/postcard/result` | 고른 첫 사진 `POST /photos` → `POST /postcards` → `GET /postcards/{id}` 1.5초 폴링 |
+| 09·10 회고 엽서 | `/postcard`, `/postcard/result` | 사진 1장 `POST /photos` → `POST /postcards` → `GET /postcards/{id}` 1.5초 폴링. 프레임·소감은 서버가 합성한 이미지를 그대로 표시 |
+| 11 나의 발자취 | `/journey` | `GET /users/{userId}/visits`로 기간·도장·완주 코스·순간들을 계산(`lib/journey.ts`). 08 제목 옆 링크로 진입. 한걸음 수·마지막 한 줄은 기기 저장 |
 
 - 인증: 토큰은 `store/user.ts`(localStorage)에 두고 `setAccessToken`으로 모든 요청에 붙인다. 앱 실행 시 `GET /users/me`로 자동 로그인하고, 401이면 토큰을 지우고 `/start`로 보낸다(`setUnauthorizedHandler`).
 - 코드값: 화면 국적(네팔·기타)과 UI 언어(vi…)는 `api/codes.ts`에서 API 값(OTHER, VI…)으로 바꾼다.
-- 서버에 없는 화면 요소: 07 '이번 주' 필터(기간 집계 없음), 09 그림체·사진 4장(서버 엽서는 사진 1장 + 한 문장 + BASIC 템플릿)은 아직 요청에 반영되지 않는다.
+- 서버에 없는 화면 요소: 07 '이번 주' 필터(기간 집계 없음), 09 소감 번역 줄(번역 API 없음), 11 AI 이야기(고정 문장으로 대체, 제목도 '나의 이야기'), 11 한걸음 수(작성자를 내보내지 않아 이 기기에서 남긴 수만 집계), 01 프랑스어(API 언어 없음). 영국·프랑스 국적은 OTHER로 보낸다.
+- 장소 사진: 형무소·독립문·영천시장은 `public/images`의 Figma 사진을 먼저 쓰고 나머지는 서버 이미지를 쓴다(`lib/placeImage.ts`).
 - 실내 시연에서 도장을 받으려면 `NEXT_PUBLIC_DEMO_STAMP_AT_PLACE=true`(장소 좌표 전송).
 
-`motion`은 `PeekSheet`에서 쓴다. React Query는 Provider만 구성되어 있고 `useQuery`·`useMutation` 기반 기능은 아직 없다. 화면 문구는 UI 번역 사전을 거치며, `src/mocks/sample.ts`의 샘플 콘텐츠(장소 이름·추천 문구·해설 등)는 API 연동 전까지 한국어 그대로다.
+`motion`은 `PeekSheet`에서 쓴다. 화면 문구는 UI 번역 사전을 거치고, 화면 선택지는 `src/lib/options.ts`에 있다.
 
 ## 4. 기술 구성
 
@@ -148,7 +150,7 @@ flowchart LR
 - **F4**: 사진과 선택한 장소를 보내고 저장된 해설을 번역한다. 사진만으로 역사적 사실을 새로 생성하는 기능으로 바꾸지 않는다. 번역은 장소·언어별로 캐싱한다.
 - **F5**: 도장은 장소 근접 여부를 검증한 뒤 저장한다. 허용 반경·거리 계산 책임·중복 방문 정책은 별도 계약이 필요하다.
 - **F6**: 공개 지도에는 장소별 집계만 표시한다. 후기 저장 전에 욕설·광고를 걸러내며, 개인 좌표·개별 방문 시각은 노출하지 않는다.
-- **F7**: 사진 4장·소감·그림체로 비동기 생성을 시작하고 상태 조회로 결과를 받는다. 별도 가족 공유 페이지 없이 다운로드 결과를 사용한다.
+- **F7**: 사진 1장·소감으로 비동기 생성을 시작하고 상태 조회로 결과를 받는다. 별도 가족 공유 페이지 없이 다운로드 결과를 사용한다.
 - 위치는 추천·해설 및 방문 확인에 필요한 계산에만 일시 사용하고 저장하지 않는 방향으로 계약을 확인한다. 개인 방문 기록과 공개 지도 집계는 구분한다.
 
 ### P0 API 대응표

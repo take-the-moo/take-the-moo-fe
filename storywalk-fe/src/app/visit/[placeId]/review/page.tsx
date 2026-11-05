@@ -6,6 +6,7 @@ import { useState } from "react";
 import { ApiError } from "@/api/client";
 import { photosApi } from "@/api/photos";
 import { reviewsApi } from "@/api/reviews";
+import { PlusIcon } from "@/components/icons";
 import { Button, ImagePlaceholder, InfoBox, Screen, ScreenBody, ScreenFooter, SectionTitle, TextArea, TopBar } from "@/components/ui";
 import { usePlace } from "@/hooks/usePlaces";
 import { useT } from "@/i18n";
@@ -14,7 +15,7 @@ import { takePhoto } from "@/platform/camera";
 import { useUserStore } from "@/store/user";
 import { cn } from "@/lib/cn";
 
-// N3 한걸음 작성 · F6 — Figma 1:136
+// N3 한걸음 작성 · F6 — Figma 9:1365
 // 사진이 있으면 POST /photos로 먼저 올리고, POST /places/{placeId}/reviews(JSON)로 저장한 뒤 07 흔적 지도로 간다(트리거 13).
 // 부적절한 표현(422 REVIEW_INAPPROPRIATE)이면 입력을 유지하고 오류만 안내한다(v3.1 노트).
 // 작성 언어(language)는 보내지 않는다 — 설정 언어와 실제로 쓴 언어가 다를 수 있어 서버가 판정한다.
@@ -29,6 +30,7 @@ export default function ReviewPage() {
   const queryClient = useQueryClient();
   const place = usePlace(placeId);
   const userId = useUserStore((s) => s.userId);
+  const addFootstep = useUserStore((s) => s.addFootstep);
   const [text, setText] = useState("");
   const [photo, setPhoto] = useState<{ url: string; blob: Blob } | null>(null);
   const [status, setStatus] = useState<Status>({ kind: "idle" });
@@ -52,7 +54,8 @@ export default function ReviewPage() {
       const photoId = photo
         ? (await photosApi.upload({ file: await toUploadFile(photo.blob), userId, placeId })).photoId
         : undefined;
-      await reviewsApi.create(placeId, { userId, content: text.trim(), photoId });
+      const review = await reviewsApi.create(placeId, { userId, content: text.trim(), photoId });
+      addFootstep({ name: place?.name ?? "", date: review.writtenDate });
       await queryClient.invalidateQueries({ queryKey: ["reviews", placeId] });
       await queryClient.invalidateQueries({ queryKey: ["places"] });
       router.push(`/map?placeId=${placeId}`); // 방금 남긴 장소를 지도에서 바로 보여준다
@@ -71,57 +74,64 @@ export default function ReviewPage() {
   return (
     <Screen>
       <TopBar title={t("한걸음 남기기")} />
-      <ScreenBody>
-        <div className="flex items-center gap-2 rounded-control bg-surface-sunken px-3 py-2">
+      <ScreenBody className="gap-8! pt-2!">
+        <div className="flex items-center gap-2 self-start rounded-[20px] bg-surface-sunken px-3 py-2">
           <span className="text-body font-bold text-fg">{place?.name ?? t("알 수 없는 장소")}</span>
-          <span className="text-caption text-fg-muted">{t("방문 완료")}</span>
+          <span className="text-caption font-medium text-fg-muted">{t("방문 완료")}</span>
         </div>
 
-        <SectionTitle>
-          <label htmlFor="footstep">{t("한 줄로 남겨보세요")}</label>
-        </SectionTitle>
-        <TextArea
-          id="footstep"
-          className={cn("h-[110px]", error?.blocked && "border-fg")}
-          maxLength={MAX}
-          value={text}
-          onChange={(e) => {
-            setText(e.target.value);
-            if (error) setStatus({ kind: "idle" });
-          }}
-          placeholder={t("오늘 이곳에서 본 것, 느낀 것을 한 줄로")}
-          aria-describedby="footstep-guide"
-          aria-invalid={error?.blocked || undefined}
-        />
-        <div className="flex w-full items-start justify-between gap-3">
-          <p id="footstep-guide" role={error ? "alert" : undefined} className="flex items-center gap-1.5 text-caption text-fg">
-            <span aria-hidden className="flex size-[18px] shrink-0 items-center justify-center rounded-full border border-fg text-micro font-bold">
-              !
+        <section className="flex flex-col gap-3">
+          <SectionTitle>{t("사진 (선택)")}</SectionTitle>
+          <button
+            type="button"
+            onClick={pickPhoto}
+            aria-label={photo ? t("사진 바꾸기") : t("사진 추가")}
+            className="flex size-24 flex-col items-center justify-center gap-2 overflow-hidden rounded-control bg-surface-sunken text-caption font-medium text-fg-muted"
+          >
+            {photo ? (
+              <ImagePlaceholder src={photo.url} label={t("첨부한 사진")} className="size-24" />
+            ) : (
+              <>
+                <PlusIcon />
+                {t("사진 추가")}
+              </>
+            )}
+          </button>
+        </section>
+
+        <section className="flex flex-col gap-3">
+          <SectionTitle>
+            <label htmlFor="footstep">{t("한 줄로 남겨보세요")}</label>
+          </SectionTitle>
+          <TextArea
+            id="footstep"
+            className="h-28"
+            maxLength={MAX}
+            value={text}
+            onChange={(e) => {
+              setText(e.target.value);
+              if (error) setStatus({ kind: "idle" });
+            }}
+            placeholder={t("오늘 이곳에서 본 것, 느낀 것을 한 줄로")}
+            aria-describedby="footstep-guide"
+            aria-invalid={error?.blocked || undefined}
+          />
+          <div className="flex w-full items-start justify-between gap-3 text-caption font-medium">
+            <p id="footstep-guide" role={error ? "alert" : undefined} className={cn("flex items-center gap-1.5", error ? "text-fg" : "text-fg-muted")}>
+              <span aria-hidden className="flex size-4 shrink-0 items-center justify-center rounded-full border border-current">
+                !
+              </span>
+              {error ? error.message : t("부적절한 표현이 있으면 저장되지 않아요")}
+            </p>
+            <span className="shrink-0 text-fg-muted">
+              {text.length} / {MAX}
             </span>
-            {error ? error.message : t("부적절한 표현이 있으면 저장되지 않아요")}
-          </p>
-          <span className="shrink-0 text-caption text-fg-muted">
-            {text.length} / {MAX}
-          </span>
-        </div>
-
-        <SectionTitle>{t("사진 (선택)")}</SectionTitle>
-        <button
-          type="button"
-          onClick={pickPhoto}
-          aria-label={photo ? t("사진 바꾸기") : t("사진 추가")}
-          className={cn(
-            "flex size-24 items-center justify-center overflow-hidden rounded-control text-label text-fg-muted",
-            !photo && "border border-dashed border-line bg-surface-subtle",
-          )}
-        >
-          {photo ? <ImagePlaceholder src={photo.url} label={t("첨부한 사진")} className="size-24" /> : t("+ 사진")}
-        </button>
-
-        <InfoBox className="flex flex-col gap-1.5">
-          <p>{t("보는 사람의 언어로 자동 번역돼요 · 원문 언어가 함께 표시돼요")}</p>
-          <p className="leading-[normal]">{t("내 위치와 방문 시각은 공개되지 않아요")}</p>
-        </InfoBox>
+          </div>
+          <InfoBox className="flex flex-col gap-1.5">
+            <p>{t("보는 사람의 언어로 자동 번역돼요 · 원문 언어가 함께 표시돼요")}</p>
+            <p>{t("내 위치와 방문 시각은 공개되지 않아요")}</p>
+          </InfoBox>
+        </section>
       </ScreenBody>
       <ScreenFooter>
         <Button onClick={submit} disabled={!text.trim() || status.kind === "saving"}>

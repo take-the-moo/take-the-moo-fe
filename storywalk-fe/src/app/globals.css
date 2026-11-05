@@ -1,56 +1,45 @@
 @import "tailwindcss";
 
 /*
- * 디자인 토큰 (최소 세트)
- * 출처: Figma ui_ref 와이어프레임의 WF/* 컴포넌트 실측값.
- * 와이어프레임 단계라 회색 계열만 있다. 비주얼 디자인이 확정되면 이 값만 바꾼다.
- * 1px 안팎으로 차이 나는 회색은 하나로 합쳤다 (예: #212121·#222 → fg, #f0f0f0 → surface-sunken).
+ * 디자인 토큰. 출처: Figma ui_final의 변수(Main·Sub·Point)와 텍스트 스타일.
  */
 @theme {
   /* 텍스트 */
-  --color-ink: #141414; /* 화면 대제목 */
-  --color-fg: #262626; /* 기본 본문·제목 */
-  --color-fg-sub: #4d4d4d; /* 보조 설명, 기본 칩 */
-  --color-fg-caption: #737373; /* 카드 라벨·부제 (Figma #737373·#666·#595959 계열을 하나로) */
-  --color-fg-muted: #808080; /* 캡션, 플레이스홀더 */
-  --color-fg-disabled: #999999; /* 비활성 탭, 진행 단계 화살표·빈 원 */
+  --color-fg: #1d1d1d; /* Main/Black — 제목·본문 */
+  --color-fg-sub: #3d3d3d; /* Sub/Gray 700 — 섹션 제목, 기본 칩 */
+  --color-fg-muted: #8a8a8a; /* Sub/Gray 500 — 캡션, 플레이스홀더, 비활성 탭 */
 
   /* 면 */
-  --color-primary: #333333; /* 주 버튼, 선택 칩 */
-  --color-on-primary: #ffffff;
+  --color-primary: #1d1d1d; /* 주 버튼, 선택 칩 */
+  --color-point: #fcff5b; /* Point/Yellow — 주 버튼 글자, 탭 표시, 완료 체크 */
   --color-surface: #ffffff;
-  --color-surface-sunken: #f2f2f2; /* 안내 박스, 기본 칩 */
-  --color-surface-placeholder: #e0e0e0; /* 이미지 자리 */
-  --color-surface-subtle: #fafafa; /* 사진 추가 칸 */
-  --color-dim: rgb(0 0 0 / 0.35); /* 바텀시트 뒤 */
+  --color-surface-sunken: #f5f5f5; /* Sub/Gray 100 — 안내 박스 */
+  --color-surface-placeholder: #e5e5e5; /* Sub/Gray 200 — 이미지 자리 */
 
   /* 선 */
-  --color-line-subtle: #e0e0e0; /* 탭바 상단 */
-  --color-line: #d9d9d9; /* 카드 테두리 */
-  --color-line-strong: #cccccc; /* 보조 버튼 테두리 */
-
-  /* 포인트 — Figma 변수 Point/Orange (값은 노란색) */
-  --color-point: #fcff5b;
+  --color-line-subtle: #f5f5f5; /* 탭바 상단 */
+  --color-line: #e5e5e5; /* 카드 테두리, 비활성 버튼 */
+  --color-line-strong: #8a8a8a; /* 기본 칩 테두리 */
+  --color-track: #dbdae2; /* 날짜별 기록 선, 시트 손잡이 */
 
   /* 모서리 */
-  --radius-control: 12px; /* 버튼, 입력, 이미지 자리 */
-  --radius-box: 14px; /* 안내 박스, 카드 */
-  --radius-pill: 16px; /* 칩 */
-  --radius-field: 10px; /* 텍스트 입력 */
-  --radius-sheet: 24px; /* 바텀시트 상단, 로고 */
+  --radius-control: 16px; /* 버튼, 입력, 카드, 이미지 */
+  --radius-pill: 25px; /* 칩 */
+  --radius-sheet: 15px; /* 지도 시트 상단 */
 
   /* 글자 크기 */
-  --text-display: 28px;
-  --text-heading: 22px; /* 탭 화면 제목 (지금·흔적 지도·나의 기록) */
+  --text-display: 36px; /* 시작 화면 */
+  --text-heading: 26px; /* 탭 화면 제목 */
+  --text-page: 24px; /* 가입·설정 화면 제목 */
   --text-title: 20px;
-  --text-headline: 17px; /* 상단 바 제목 */
+  --text-headline: 18px; /* 상단 바 제목 */
   --text-body-lg: 16px; /* 섹션 제목, 버튼 */
   --text-body: 14px;
-  --text-label: 13px; /* 칩, 안내 박스 */
   --text-caption: 12px;
-  --text-micro: 11px; /* 탭 라벨 */
+  --text-micro: 10px; /* 카드 태그 */
 }
 
 body {
+  line-height: 1.2; /* Figma의 line-height normal(Noto Sans KR) */
   -webkit-tap-highlight-color: transparent;
 }
