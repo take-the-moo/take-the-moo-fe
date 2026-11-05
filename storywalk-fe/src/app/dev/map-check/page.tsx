@@ -15,6 +15,7 @@ export default function MapCheck() {
   const mapEl = useRef<HTMLDivElement>(null);
   const panoEl = useRef<HTMLDivElement>(null);
   const panoRef = useRef<naver.maps.Panorama | null>(null);
+  const current = useRef(POINTS[0].name);
   const [ready, setReady] = useState(false);
   const [log, setLog] = useState<string[]>([]);
   const push = (s: string) => setLog((l) => [...l, s]);
@@ -32,7 +33,6 @@ export default function MapCheck() {
       push(`❌ ${(event as CustomEvent<Error>).detail.message}`);
     };
     window.addEventListener("naver-maps-auth-failure", onAuthFailure);
-    setReady(false);
     (async () => {
       try {
         await loadNaverMaps();
@@ -57,6 +57,8 @@ export default function MapCheck() {
       cancelled = true;
       window.removeEventListener("naver-maps-auth-failure", onAuthFailure);
       panoRef.current = null;
+      // 재실행(Fast Refresh 등) 시 이전 ready=true가 남지 않도록 cleanup에서 초기화한다.
+      setReady(false);
       if (window.naver?.maps) {
         if (pano) naver.maps.Event.clearInstanceListeners(pano);
         map?.destroy();
@@ -65,7 +67,6 @@ export default function MapCheck() {
     };
   }, []);
 
-  const current = useRef(POINTS[0].name);
   const go = (p: (typeof POINTS)[number]) => {
     if (!ready || !panoRef.current) return;
     current.current = p.name;
