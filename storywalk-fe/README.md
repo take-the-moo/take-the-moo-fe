@@ -1,5 +1,12 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## 프로젝트 문서
+
+- [프로젝트 개요·아키텍처](docs/ARCHITECTURE.md): 요구사항 F1~F7, 구현 현황, 구조·데이터 흐름, API, 실행·배포 제약.
+- [하네스 엔지니어링](docs/HARNESS_ENGINEERING.md): 주요 작업 규칙, 요구사항별 인수 기준, 검증·인계 절차.
+- [기획안·요구사항 v2](../요구서.md): 상위 디렉터리에 있는 서비스 요구사항 원문.
+- [Figma 디자인](https://www.figma.com/design/LiOMcefG48DP23YjkXeLgg/Untitled?node-id=0-1&t=5vN8C4Fc3uBkVfOp-1): 화면·사용자 흐름 참조.
+
 ## Getting Started
 
 이 프로젝트는 pnpm만 사용한다 (`package.json`의 `packageManager` 버전).
