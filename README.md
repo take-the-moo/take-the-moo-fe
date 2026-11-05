@@ -155,5 +155,4 @@ storywalk-fe/
 
 - [프로젝트 아키텍처](docs/ARCHITECTURE.md) — 요구사항, 화면·API 구현 현황, 데이터 흐름과 배포 제약
 - [하네스 엔지니어링](docs/HARNESS_ENGINEERING.md) — 개발 규칙, 기능별 인수 기준과 검증 절차
-- [도보 경로안내 백엔드 협의안](docs/ROUTE_GUIDANCE_BACKEND.md) — 경로 조회 API와 처리 로직 제안
 - [Figma 디자인](https://www.figma.com/design/LiOMcefG48DP23YjkXeLgg/Untitled?node-id=0-1&t=5vN8C4Fc3uBkVfOp-1) — 화면·사용자 흐름 참조
