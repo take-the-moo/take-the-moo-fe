@@ -1,0 +1,10 @@
+node_modules
+.next
+out
+ios
+docs
+.env*
+*.pem
+.DS_Store
+Dockerfile
+.dockerignore
