@@ -1,6 +1,12 @@
 import type { Metadata, Viewport } from "next";
+import { Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
+
+const notoSansKR = Noto_Sans_KR({
+  subsets: ["latin", "vietnamese"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Seoul Storywalk",
@@ -17,7 +23,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
-      <body className="min-h-dvh bg-white text-neutral-900 antialiased">
+      <body className={`${notoSansKR.className} min-h-dvh bg-white text-neutral-900 antialiased`}>
         <Providers>
           <main className="mx-auto min-h-dvh max-w-md pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
             {children}
