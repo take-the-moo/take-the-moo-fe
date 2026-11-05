@@ -10,9 +10,7 @@ export const llmApi = {
   askImage: ({ file, question, promptKey }: ImageQuestionRequest, signal?: AbortSignal) => {
     const body = new FormData();
     body.append("file", file);
-    body.append("question", question);
-    if (promptKey != null) body.append("promptKey", promptKey);
-    return api<ChatResponse>("/image", { method: "POST", body, signal });
+    return api<ChatResponse>(withQuery("/image", { question, promptKey }), { method: "POST", body, signal });
   },
   getHealth: (signal?: AbortSignal) => api<Health>("/health", { signal }),
 };
