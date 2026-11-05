@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Capacitor iOS 네이티브 프로젝트와 Xcode 빌드 생성물(.build, DerivedData, App/public 복사본)
+    "ios/**",
   ]),
 ]);
 
