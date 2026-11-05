@@ -113,9 +113,9 @@ JSON 요청에는 기본 `Content-Type: application/json`을 넣고, `FormData`�
 | 화면 일시 상태 | 페이지의 React state·ref | 검증 로그, SDK 준비 상태 등 |
 | 사용자 상태 | `src/store/user.ts` | `userId`, `nationality`, `language`를 `storywalk-user` 키로 localStorage에 유지. `setUser`, `reset` 제공 |
 | 서버 상태 | `src/app/providers.tsx` | QueryClient 기반만 있음. 영속 캐시는 설정되지 않음 |
-| UI 번역 | `src/i18n/index.ts` | 한국어·베트남어의 4개 문구. 미지원 언어는 한국어로 대체 |
+| UI 번역 | `src/i18n/index.ts` | 한국어·베트남어·중국어·몽골어·영어·일본어의 4개 고정 문구. 선택한 언어로 탭 라벨 표시. 미지원 언어는 한국어로 대체 |
 
-장소 이야기·해설·후기 번역은 요구서상 백엔드 책임이다. 클라이언트 번역 사전에 생성 콘텐츠를 저장하는 구조가 아니다. 두 번째 시연 국적과 지원 언어 범위는 추가 합의가 필요하다.
+장소 이야기·해설·후기 번역은 요구서상 백엔드 책임이다. 클라이언트 번역 사전에 생성 콘텐츠를 저장하는 구조가 아니다. UI 사전은 언어 설정에서 선택 가능한 5개 언어와 한국어를 지원하며 LLM을 호출하지 않는다. 생성 콘텐츠의 지원 언어 범위와 두 번째 시연 국적은 추가 합의가 필요하다.
 
 ### 플랫폼 어댑터
 
