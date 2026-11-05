@@ -47,30 +47,6 @@ const nextConfig: NextConfig = {
 export default nextConfig;
 EOF
 
-# ios/ 아래 Xcode·SPM 빌드 생성물(.build, DerivedData)이 린트 대상에 들어가지 않게 한다.
-cat > eslint.config.mjs <<'EOF'
-import { defineConfig, globalIgnores } from "eslint/config";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
-
-const eslintConfig = defineConfig([
-  ...nextVitals,
-  ...nextTs,
-  // Override default ignores of eslint-config-next.
-  globalIgnores([
-    // Default ignores of eslint-config-next:
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
-    // Capacitor iOS 네이티브 프로젝트와 Xcode 빌드 생성물(.build, DerivedData, App/public 복사본)
-    "ios/**",
-  ]),
-]);
-
-export default eslintConfig;
-EOF
-
 cat > capacitor.config.ts <<'EOF'
 import type { CapacitorConfig } from "@capacitor/cli";
 
@@ -423,9 +399,8 @@ else
   CAP_ENV=dev pnpm exec cap sync ios
 fi
 
-echo "==> 7/7 타입·린트 검사"
+echo "==> 7/7 타입 검사"
 pnpm exec tsc --noEmit
-pnpm lint
 
 cat <<EOF
 

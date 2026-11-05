@@ -2,13 +2,14 @@
   "name": "storywalk-fe",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@12.16.1",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "ios": "CAP_ENV=dev npx cap sync ios && npx cap open ios",
-    "cap:sync": "CAP_ENV=dev npx cap sync ios"
+    "ios": "CAP_ENV=dev cap sync ios && cap open ios",
+    "cap:sync": "CAP_ENV=dev cap sync ios"
   },
   "dependencies": {
     "@capacitor/camera": "^8.2.6",
