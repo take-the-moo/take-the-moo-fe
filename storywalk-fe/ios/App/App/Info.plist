@@ -28,6 +28,31 @@
 	<dict>
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
+		<!-- 네이버 지도 SDK는 http 페이지(CAP_ENV=dev)에서 타일·리소스도 http로 요청한다 -->
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>naver.com</key>
+			<dict>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+			<key>naver.net</key>
+			<dict>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+			<key>pstatic.net</key>
+			<dict>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>현장 사진으로 장소 해설과 엽서를 만들기 위해 사용합니다.</string>

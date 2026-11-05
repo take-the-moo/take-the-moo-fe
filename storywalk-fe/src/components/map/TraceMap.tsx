@@ -11,13 +11,17 @@ export type TracePin = { id: string; label: string; count: number; at: LngLat };
 
 type Props = { pins: TracePin[]; selectedId: string; onSelect: (id: string) => void; className?: string };
 
+const pinSize = (selected: boolean) => (selected ? 40 : 30);
+
+// 마커의 터치 영역은 content의 레이아웃 박스다. transform으로 옮기거나 이름표로 박스를 키우면
+// 보이지 않는 영역이 옆 핀의 탭을 가로채므로, 박스는 원 크기로 두고 이름표는 absolute로 띄운다.
 const pinHtml = (pin: TracePin, selected: boolean) => {
-  const size = selected ? 40 : 30;
+  const size = pinSize(selected);
   const bg = selected ? "#141414" : "#595959";
-  return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;transform:translate(-50%,-${size / 2}px);cursor:pointer">
-    <div style="width:${size}px;height:${size}px;border-radius:50%;background:${bg};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:${selected ? 13 : 11}px">${pin.count}</div>
-    <div style="font-size:10px;font-weight:700;color:#333;white-space:nowrap;text-shadow:0 0 2px #fff">${pin.label}</div>
-  </div>`;
+  const label = selected
+    ? `<div style="position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:2px;pointer-events:none;font-size:10px;font-weight:700;color:#333;white-space:nowrap;text-shadow:0 0 2px #fff">${pin.label}</div>`
+    : "";
+  return `<div style="position:relative;width:${size}px;height:${size}px;border-radius:50%;background:${bg};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:${selected ? 13 : 11}px;cursor:pointer">${pin.count}${label}</div>`;
 };
 
 export function TraceMap({ pins, selectedId, onSelect, className }: Props) {
@@ -32,7 +36,9 @@ export function TraceMap({ pins, selectedId, onSelect, className }: Props) {
   // 지도 생성 (1회)
   useEffect(() => {
     let cancelled = false;
+    let observer: ResizeObserver | undefined;
     const onAuthFailure = () => {
+      observer?.disconnect();
       mapRef.current?.destroy();
       mapRef.current = null;
       setMode("fallback");
@@ -44,12 +50,18 @@ export function TraceMap({ pins, selectedId, onSelect, className }: Props) {
         const bounds = new naver.maps.LatLngBounds(toLatLng(pins[0].at), toLatLng(pins[0].at));
         pins.forEach((p) => bounds.extend(toLatLng(p.at)));
         const map = new naver.maps.Map(el.current, { bounds, mapDataControl: false, scaleControl: false, logoControl: true });
+        // 핀 원·이름표가 잘리거나 하단 NAVER 로고에 가리지 않을 여백
+        map.fitBounds(bounds, { top: 40, right: 40, bottom: 56, left: 40 });
         mapRef.current = map;
         setMode("map");
+        // 컨테이너 높이가 시트를 따라 변한다. 축척은 그대로 두고 보이는 영역만 바꾼다.
+        observer = new ResizeObserver(() => map.autoResize());
+        observer.observe(el.current);
       })
       .catch(() => !cancelled && setMode("fallback"));
     return () => {
       cancelled = true;
+      observer?.disconnect();
       window.removeEventListener("naver-maps-auth-failure", onAuthFailure);
       mapRef.current?.destroy();
       mapRef.current = null;
@@ -63,11 +75,12 @@ export function TraceMap({ pins, selectedId, onSelect, className }: Props) {
     const map = mapRef.current;
     if (mode !== "map" || !map) return;
     const markers = pins.map((pin) => {
+      const half = pinSize(pin.id === selectedId) / 2;
       const marker = new naver.maps.Marker({
         map,
         position: toLatLng(pin.at),
         title: `${pin.label} · ${pin.count}명`,
-        icon: { content: pinHtml(pin, pin.id === selectedId) },
+        icon: { content: pinHtml(pin, pin.id === selectedId), anchor: new naver.maps.Point(half, half) },
         zIndex: pin.id === selectedId ? 10 : 1,
       });
       naver.maps.Event.addListener(marker, "click", () => onSelectRef.current(pin.id));
@@ -82,7 +95,8 @@ export function TraceMap({ pins, selectedId, onSelect, className }: Props) {
 
   return (
     <div className={cn("relative h-[220px] w-full overflow-hidden rounded-box bg-surface-sunken", className)}>
-      <div ref={el} className={cn("absolute inset-0", mode !== "map" && "invisible")} />
+      {/* SDK가 컨테이너에 position:relative를 넣어 inset 기반 높이는 0이 된다. 높이를 직접 준다 */}
+      <div ref={el} className={cn("size-full", mode !== "map" && "invisible")} />
       {mode === "fallback" && <Schematic pins={pins} selectedId={selectedId} onSelect={onSelect} />}
     </div>
   );

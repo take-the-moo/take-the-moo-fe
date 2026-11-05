@@ -9,4 +9,5 @@ export { TextField, TextArea, FieldLabel } from "./Field";
 export { CheckCircle } from "./CheckCircle";
 export { OptionRow } from "./OptionRow";
 export { BottomSheet } from "./BottomSheet";
+export { PeekSheet } from "./PeekSheet";
 export { Divider } from "./Divider";

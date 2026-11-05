@@ -121,6 +121,12 @@ export const PLACE_STATS = {
 export const FOOTSTEPS = [
   { id: "f1", nationality: "베트남", date: "11/1", text: "벽돌 담이 생각보다 높아서 한참 서 있었어요." },
   { id: "f2", nationality: "몽골", date: "10/28", text: "시장 떡볶이 아주머니가 길을 알려줬어요." },
+  { id: "f3", nationality: "중국", date: "10/25", text: "전시실이 조용해서 천천히 읽을 수 있었어요." },
+  { id: "f4", nationality: "베트남", date: "10/22", text: "독립문까지 걸어가는 길이 생각보다 가까웠어요." },
+  { id: "f5", nationality: "일본", date: "10/19", text: "안내문이 쉬운 한국어로 되어 있으면 좋겠어요." },
+  { id: "f6", nationality: "몽골", date: "10/15", text: "해 질 무렵에 오니 벽돌색이 더 진하게 보였어요." },
+  { id: "f7", nationality: "베트남", date: "10/11", text: "친구와 같이 와서 서로 나라 이야기를 했어요." },
+  { id: "f8", nationality: "중국", date: "10/8", text: "옥사 복도를 걸을 때 발소리가 크게 울렸어요." },
 ];
 
 // ── 08 나의 기록 ─────────────────────────────────────────
