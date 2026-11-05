@@ -1,26 +1,34 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { api, ApiError } from "@/api/client";
+import { ApiError } from "@/api/client";
+import { photosApi } from "@/api/photos";
+import { reviewsApi } from "@/api/reviews";
 import { Button, ImagePlaceholder, InfoBox, Screen, ScreenBody, ScreenFooter, SectionTitle, TextArea, TopBar } from "@/components/ui";
+import { usePlace } from "@/hooks/usePlaces";
 import { useT } from "@/i18n";
-import { findPlace } from "@/mocks/sample";
+import { toUploadFile } from "@/lib/image";
 import { takePhoto } from "@/platform/camera";
+import { useUserStore } from "@/store/user";
 import { cn } from "@/lib/cn";
 
 // N3 한걸음 작성 · F6 — Figma 1:136
-// POST /places/{placeId}/reviews로 저장하고 07 흔적 지도로 간다(트리거 13).
-// 부적절한 표현(422)이면 입력을 유지하고 오류만 안내한다(v3.1 노트). 요청 필드명은 백엔드와 미확정이다.
+// 사진이 있으면 POST /photos로 먼저 올리고, POST /places/{placeId}/reviews(JSON)로 저장한 뒤 07 흔적 지도로 간다(트리거 13).
+// 부적절한 표현(422 REVIEW_INAPPROPRIATE)이면 입력을 유지하고 오류만 안내한다(v3.1 노트).
+// 작성 언어(language)는 보내지 않는다 — 설정 언어와 실제로 쓴 언어가 다를 수 있어 서버가 판정한다.
 const MAX = 60;
 
 type Status = { kind: "idle" } | { kind: "saving" } | { kind: "error"; message: string; blocked: boolean };
 
 export default function ReviewPage() {
-  const { placeId } = useParams<{ placeId: string }>();
+  const placeId = Number(useParams<{ placeId: string }>().placeId);
   const router = useRouter();
   const t = useT();
-  const place = findPlace(placeId);
+  const queryClient = useQueryClient();
+  const place = usePlace(placeId);
+  const userId = useUserStore((s) => s.userId);
   const [text, setText] = useState("");
   const [photo, setPhoto] = useState<{ url: string; blob: Blob } | null>(null);
   const [status, setStatus] = useState<Status>({ kind: "idle" });
@@ -38,15 +46,18 @@ export default function ReviewPage() {
   };
 
   const submit = async () => {
+    if (!userId) return;
     setStatus({ kind: "saving" });
-    const body = new FormData();
-    body.set("text", text.trim());
-    if (photo) body.set("photo", photo.blob);
     try {
-      await api(`/places/${placeId}/reviews`, { method: "POST", body });
-      router.push("/map");
+      const photoId = photo
+        ? (await photosApi.upload({ file: await toUploadFile(photo.blob), userId, placeId })).photoId
+        : undefined;
+      await reviewsApi.create(placeId, { userId, content: text.trim(), photoId });
+      await queryClient.invalidateQueries({ queryKey: ["reviews", placeId] });
+      await queryClient.invalidateQueries({ queryKey: ["places"] });
+      router.push(`/map?placeId=${placeId}`); // 방금 남긴 장소를 지도에서 바로 보여준다
     } catch (e) {
-      const blocked = e instanceof ApiError && e.status === 422;
+      const blocked = e instanceof ApiError && e.code === "REVIEW_INAPPROPRIATE";
       setStatus({
         kind: "error",
         blocked,

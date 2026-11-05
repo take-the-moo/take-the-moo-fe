@@ -20,35 +20,28 @@ Figma는 `0:1` 페이지의 메타데이터에서 `사용자 플로우 v3.1` 및
 
 ## 3. 현재 구현 현황
 
-Figma ui_ref(사용자 플로우 v3.1)의 13개 화면을 **화면 단위로 구현**했다(2026-11-06). 화면 문구·수치는 `src/mocks/sample.ts`의 샘플이며, P0 API 중 실제로 호출하는 것은 `POST /users`(01)와 `POST /places/{placeId}/reviews`(N3)뿐이다. 둘 다 목 핸들러가 있다.
+Figma ui_ref(사용자 플로우 v3.1)의 13개 화면을 **화면 단위로 구현**했고(2026-11-06), BE `docs/api.md` 기준으로 P0 API에 연동했다. 화면 디자인은 그대로 두고 데이터만 API로 바꿨다.
 
-| 화면 (Figma) | 경로 | 동작 | 데이터 |
-| --- | --- | --- | --- |
-| 00 시작 선택 | `/start` | 가입하기 → N1, 가입 없이 → 01. 홈이 익명 사용자 없음을 확인하고 보냄 | 정적 |
-| N1 가입 (선택) | `/signup` | 입력·비밀번호 보기만. 인증 API 미정이라 다음 화면으로 이동만 | 없음 |
-| N2 취향 선택 | `/preferences` | 다중·축별 단일 선택, 사용자 스토어 `preferences`에 저장 | 기기 저장 |
-| 01 처음 설정 | `/setup` | 국적·언어 선택 → `POST /users` → 위치 1회 요청 → 홈 | API(목) |
-| 03 지금 (홈) | `/` | 장면 보기·인기 카드 → 04, 사진으로 묻기 → 촬영 후 05 | 샘플 |
-| 04 장면 | `/scene/[placeId]` | 다른 나라 시선 선택 UI, 사진으로 묻기 → 05, 방문 완료 → 06(도장만) | 샘플 |
-| 05 현장 해설 | `/explain` | 근처 장소 라디오, "여기 없어요" 검색, 해설 보기 → 06 | 샘플 |
-| 06 해설 결과·도장 | `/visit/[placeId]?mode=explain\|stamp` | 사진·해설·도장·코스 진행, 한걸음 → N3, 다음 장소 → 04 | 샘플 |
-| N3 한걸음 작성 | `/visit/[placeId]/review` | 60자 제한·사진 선택, 422면 입력 유지+안내, 저장 후 07 | API(목) |
-| 07 흔적 지도 | `/map` | 필터 칩, 네이버 지도 핀(실패 시 개략도), 핀 선택 → 집계 카드 | 샘플 |
-| 08 나의 기록 | `/log` | 코스·도장·날짜별 기록, 엽서 만들기 → 09 | 샘플 |
-| 09 회고 엽서 만들기 | `/postcard` | 사진 4칸 선택·추가 촬영, 소감, 그림체 → 10 | 샘플 |
-| 10 엽서 결과 | `/postcard/result` | 생성 중 진행 표시(샘플 4초) → 완료, 공유 → 07, 저장 | 샘플 |
+| 화면 (Figma) | 경로 | 연동 API |
+| --- | --- | --- |
+| 00 시작 선택 | `/start` | 로그인 전이면 Providers가 보냄. 가입하기 → N1, 로그인 → `/login` |
+| 로그인 | `/login` | `POST /auth/login` (N1과 같은 구성요소로 추가한 화면) |
+| N1 가입 | `/signup` | 아이디·비밀번호·이름 입력, `GET /auth/check-id`. 입력은 `store/signup.ts`(메모리) |
+| N2 취향 선택 | `/preferences` | 서버 계약 없음, 기기에만 저장 |
+| 01 처음 설정 | `/setup` | 국적·언어와 함께 `POST /auth/signup` → 토큰 저장 |
+| 03 지금 (홈) | `/` | 위치 1회 → `GET /now`. 시연용 `?weather=RAINY&time=15:00&stationId=` 전달 |
+| 04 장면 | `/scene/[placeId]` | `POST /scenes`(다른 나라 시선 = nationality 바꿔 재요청), 최신 한걸음 `GET /places/{id}/reviews?limit=1` |
+| 05 현장 해설 | `/explain` | `GET /places/nearby`, "여기 없어요" 검색은 `GET /map/pins` 목록 |
+| 06 해설 결과·도장 | `/visit/[placeId]` | `POST /explanations`, 진입 시 `POST /visits`(코스·다음 장소) |
+| N3 한걸음 작성 | `/visit/[placeId]/review` | `POST /photos` → `POST /places/{id}/reviews`(JSON), 422 `REVIEW_INAPPROPRIATE` |
+| 07 흔적 지도 | `/map` | `GET /map/pins`(국적 필터는 화면에서 계산), `GET /places/{id}/reviews` |
+| 08 나의 기록 | `/log` | `GET /users/{userId}/visits` |
+| 09·10 회고 엽서 | `/postcard`, `/postcard/result` | 고른 첫 사진 `POST /photos` → `POST /postcards` → `GET /postcards/{id}` 1.5초 폴링 |
 
-기능 관점의 남은 연동은 다음과 같다.
-
-| 기능 | 남은 일 |
-| --- | --- |
-| F1 | 가입·취향의 P0 포함 여부와 인증 API 결정. 위치 거부 시 대체 경로(요구서)와 v3.1 분기 삭제의 정리 |
-| F2 | `GET /now` 연동, 홈 진입·복귀 시 위치 1회 조회 |
-| F3 | `POST /scenes` 연동, "다른 나라 시선" 선택 시 재생성 요청 |
-| F4 | `GET /places/nearby`·`POST /explanations`·`POST /photos` 연동. 촬영 사진은 `src/store/capture.ts`에 실행 중에만 보관 |
-| F5 | `POST /visits`(근접 검증)·`GET /users/{id}/visits` 연동. 현재 도장은 화면 표시만 |
-| F6 | `GET /map/pins`·`GET /places/{id}/reviews` 연동. 한걸음 저장 요청 필드명 확정 |
-| F7 | `POST /postcards`·`GET /postcards/{id}` 연동. 결과 이미지가 없어 "이미지 저장"은 안내만 표시 |
+- 인증: 토큰은 `store/user.ts`(localStorage)에 두고 `setAccessToken`으로 모든 요청에 붙인다. 앱 실행 시 `GET /users/me`로 자동 로그인하고, 401이면 토큰을 지우고 `/start`로 보낸다(`setUnauthorizedHandler`).
+- 코드값: 화면 국적(네팔·기타)과 UI 언어(vi…)는 `api/codes.ts`에서 API 값(OTHER, VI…)으로 바꾼다.
+- 서버에 없는 화면 요소: 07 '이번 주' 필터(기간 집계 없음), 09 그림체·사진 4장(서버 엽서는 사진 1장 + 한 문장 + BASIC 템플릿)은 아직 요청에 반영되지 않는다.
+- 실내 시연에서 도장을 받으려면 `NEXT_PUBLIC_DEMO_STAMP_AT_PLACE=true`(장소 좌표 전송).
 
 `motion`은 `PeekSheet`에서 쓴다. React Query는 Provider만 구성되어 있고 `useQuery`·`useMutation` 기반 기능은 아직 없다. 화면 문구는 UI 번역 사전을 거치며, `src/mocks/sample.ts`의 샘플 콘텐츠(장소 이름·추천 문구·해설 등)는 API 연동 전까지 한국어 그대로다.
 

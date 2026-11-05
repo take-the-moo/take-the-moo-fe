@@ -1,26 +1,42 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { placesApi } from "@/api/places";
+import type { MapPin } from "@/api/types";
 import { Button, ImagePlaceholder, OptionRow, Screen, ScreenBody, ScreenFooter, TextField, TopBar } from "@/components/ui";
+import { useCurrentLocation } from "@/hooks/useCurrentLocation";
+import { usePlaces } from "@/hooks/usePlaces";
 import { useT } from "@/i18n";
-import { NEARBY, PLACES, type Place } from "@/mocks/sample";
+import { distanceLabel } from "@/lib/format";
 import { takePhoto } from "@/platform/camera";
 import { useCaptureStore, useLatestPhoto } from "@/store/capture";
 
 // 05 현장 해설 · 장소 확인 · F4 — Figma 1:436 (썸네일 0.6배를 390 기준으로 환산)
 // 사진만으로 장소를 추측하지 않고 사용자가 근처 장소 중에서 고른다(요구서 F4).
-// 근처 후보는 GET /places/nearby 연동 전까지 샘플이다. "여기 없어요"는 검색 후 이 화면에서 바로 고른다.
+// 근처 후보는 GET /places/nearby(위치 1회, 거부면 기본 역 기준). "여기 없어요"는 전체 장소 목록에서 이름으로 찾는다.
+// 고른 장소는 사진에 기록해 두었다가 사진을 올릴 때 placeId로 보낸다(엽서 제목의 장소).
 const SEARCH = "search";
+const NEARBY_LIMIT = 3;
 
 export default function ExplainPage() {
   const router = useRouter();
   const t = useT();
   const photo = useLatestPhoto();
   const addPhoto = useCaptureStore((s) => s.add);
-  const [selected, setSelected] = useState<string>(NEARBY[0].place.id);
+  const tagPlace = useCaptureStore((s) => s.tagPlace);
+  const location = useCurrentLocation();
+  const nearby = useQuery({
+    queryKey: ["nearby", location.data],
+    queryFn: ({ signal }) =>
+      placesApi.getNearby(location.data ? { ...location.data, limit: NEARBY_LIMIT } : { limit: NEARBY_LIMIT }, signal),
+    enabled: !location.isPending,
+  });
+  const places = usePlaces();
+  const [choice, setChoice] = useState<string | null>(null); // 사용자가 고른 행 (없으면 가장 가까운 곳)
   const [query, setQuery] = useState("");
-  const [picked, setPicked] = useState<Place | null>(null); // 검색으로 고른 장소
+  const [picked, setPicked] = useState<MapPin | null>(null); // 검색으로 고른 장소
 
   const retake = async () => {
     try {
@@ -30,10 +46,15 @@ export default function ExplainPage() {
     }
   };
 
-  const results = query.trim()
-    ? Object.values(PLACES).filter((p: Place) => p.name.includes(query.trim()))
-    : [];
-  const targetId = selected === SEARCH ? picked?.id : selected;
+  const results = query.trim() ? (places.data ?? []).filter((p) => p.name.includes(query.trim())).slice(0, 8) : [];
+  const selected = choice ?? (nearby.data?.[0] ? String(nearby.data[0].placeId) : null);
+  const targetId = selected === SEARCH ? picked?.placeId : selected ? Number(selected) : undefined;
+
+  const showExplanation = () => {
+    if (targetId == null) return;
+    if (photo) tagPlace(photo.url, targetId);
+    router.push(`/visit/${targetId}?mode=explain`);
+  };
 
   return (
     <Screen>
@@ -46,20 +67,22 @@ export default function ExplainPage() {
         <p className="text-caption leading-[1.45] text-fg-muted">{t("근처 장소 중에서 골라주세요 · 위치는 저장하지 않아요")}</p>
 
         <div role="radiogroup" aria-label={t("사진 속 장소")} className="flex flex-col gap-2.5">
-          {NEARBY.map(({ place, spot, distance }) => (
+          {nearby.isPending && <p className="px-1 text-caption text-fg-muted">{t("불러오는 중…")}</p>}
+          {nearby.isError && <p className="px-1 text-caption text-fg-muted">{t("불러오지 못했어요. 잠시 후 다시 시도해 주세요.")}</p>}
+          {nearby.data?.map((place) => (
             <OptionRow
-              key={place.id}
-              title={spot ? `${place.name} · ${spot}` : place.name}
-              sub={distance}
-              selected={selected === place.id}
-              onSelect={() => setSelected(place.id)}
+              key={place.placeId}
+              title={place.name}
+              sub={distanceLabel(place.distanceMeters)}
+              selected={selected === String(place.placeId)}
+              onSelect={() => setChoice(String(place.placeId))}
             />
           ))}
           <OptionRow
             title={picked ? picked.name : t("여기 없어요")}
             sub={picked ? t("직접 검색해서 골랐어요") : t("직접 검색하기")}
             selected={selected === SEARCH}
-            onSelect={() => setSelected(SEARCH)}
+            onSelect={() => setChoice(SEARCH)}
           />
         </div>
 
@@ -74,7 +97,7 @@ export default function ExplainPage() {
             />
             {results.map((p) => (
               <button
-                key={p.id}
+                key={p.placeId}
                 type="button"
                 onClick={() => {
                   setPicked(p);
@@ -93,7 +116,7 @@ export default function ExplainPage() {
       </ScreenBody>
       <ScreenFooter>
         {/* 트리거 10: 해설 보기 → 06 */}
-        <Button disabled={!targetId} onClick={() => router.push(`/visit/${targetId}?mode=explain`)}>
+        <Button disabled={targetId == null} onClick={showExplanation}>
           {t("해설 보기")}
         </Button>
       </ScreenFooter>

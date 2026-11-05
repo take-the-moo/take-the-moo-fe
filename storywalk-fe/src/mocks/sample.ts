@@ -156,6 +156,6 @@ export const POSTCARD = {
   caption: "2026. 11. 8 · 서대문 독립 코스",
   /** 생성 결과 이미지. 생성 API가 없어 아직 비어 있다. */
   imageUrl: null as string | null,
-  /** 요구서 기준 예상 소요 시간 */
-  expectedSeconds: 30,
+  /** 예상 소요 시간 — 서버 기준 보통 2~3초 (docs/api.md POST /postcards) */
+  expectedSeconds: 5,
 };

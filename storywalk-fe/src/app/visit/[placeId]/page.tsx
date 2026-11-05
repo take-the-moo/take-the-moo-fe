@@ -1,18 +1,29 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { use } from "react";
-import { CourseSteps } from "@/components/course/CourseProgress";
+import { ApiError } from "@/api/client";
+import { toApiLanguage } from "@/api/codes";
+import { placesApi } from "@/api/places";
+import { visitsApi } from "@/api/visits";
+import { courseStops, CourseSteps } from "@/components/course/CourseProgress";
 import { Button, Card, Chip, ChipGroup, ImagePlaceholder, Screen, ScreenBody, ScreenFooter, TopBar } from "@/components/ui";
-import { useLang, useT } from "@/i18n";
-import { EXPLANATION, findPlace, INDEPENDENCE_COURSE, languageLabel } from "@/mocks/sample";
+import { usePlace } from "@/hooks/usePlaces";
+import { useLang, useT, type MsgKey } from "@/i18n";
+import { parseDate } from "@/lib/format";
+import { languageLabel } from "@/mocks/sample";
+import { getCurrentPosition } from "@/platform/location";
 import { useLatestPhoto } from "@/store/capture";
 import { useUserStore } from "@/store/user";
 
 // 06 해설 결과 · 방문 도장 · F4·F5 — Figma 1:466 (썸네일 0.6배를 390 기준으로 환산)
-// mode=explain: 05에서 장소를 고르고 온 경우 — 사진·저장된 해설·도장·코스 진행
+// mode=explain: 05에서 장소를 고르고 온 경우 — 사진·저장된 해설(POST /explanations)·도장·코스 진행
 // mode=stamp:   04 "방문 완료"(트리거 9)로 온 경우 — 사진·해설 없이 도장 영역만 (v3.1 노트)
-// 해설은 POST /explanations, 도장은 POST /visits(좌표 근접 검증) 연동 전까지 샘플이다.
+// 도장은 들어오면 바로 POST /visits(현재 위치로 근접 검증, 기본 200m)를 부른다. 같은 날 다시 찍으면 서버가 alreadyStamped로 준다.
+// 실내 시연은 NEXT_PUBLIC_DEMO_STAMP_AT_PLACE=true로 기기 위치 대신 장소 좌표를 보낸다 (BE 문서의 시연 방법).
+const STAMP_AT_PLACE = process.env.NEXT_PUBLIC_DEMO_STAMP_AT_PLACE === "true";
+
 type Props = {
   params: Promise<{ placeId: string }>;
   searchParams: Promise<{ mode?: string }>;
@@ -21,17 +32,40 @@ type Props = {
 const dateLabel = (d: Date, lang: string | null) =>
   new Intl.DateTimeFormat(lang ?? "ko", { month: "numeric", day: "numeric", weekday: "short" }).format(d);
 
+class NoLocationError extends Error {}
+
 export default function VisitPage({ params, searchParams }: Props) {
-  const { placeId } = use(params);
+  const placeId = Number(use(params).placeId);
   const { mode } = use(searchParams);
   const router = useRouter();
   const t = useT();
   const lang = useLang();
-  const place = findPlace(placeId);
+  const place = usePlace(placeId);
   const photo = useLatestPhoto();
+  const userId = useUserStore((s) => s.userId);
   const language = useUserStore((s) => s.language);
+  const explain = mode === "explain";
 
-  if (!place) {
+  const explanation = useQuery({
+    queryKey: ["explanation", placeId, language],
+    queryFn: ({ signal }) => placesApi.explain({ placeId, language: toApiLanguage(language) }, signal),
+    enabled: explain && Number.isInteger(placeId),
+    staleTime: Infinity,
+  });
+
+  const visit = useQuery({
+    queryKey: ["visit", placeId, userId],
+    queryFn: async ({ signal }) => {
+      const at = STAMP_AT_PLACE && place ? { lat: place.latitude, lng: place.longitude } : await getCurrentPosition().catch(() => null);
+      if (!at) throw new NoLocationError();
+      return visitsApi.stamp({ userId: userId!, placeId, ...at }, signal);
+    },
+    enabled: Boolean(userId) && Number.isInteger(placeId) && (!STAMP_AT_PLACE || Boolean(place)),
+    staleTime: Infinity,
+    retry: false,
+  });
+
+  if (!Number.isInteger(placeId)) {
     return (
       <Screen>
         <TopBar title={t("장소를 찾을 수 없어요")} />
@@ -39,16 +73,15 @@ export default function VisitPage({ params, searchParams }: Props) {
     );
   }
 
-  const explain = mode === "explain";
-  const stops = INDEPENDENCE_COURSE.stops;
-  const index = stops.findIndex((s) => s.id === place.id);
-  const inCourse = index >= 0;
-  const doneIds = inCourse ? stops.slice(0, index + 1).map((s) => s.id) : [];
-  const next = inCourse ? stops[index + 1] : undefined;
+  const stamp = visit.data;
+  const course = stamp?.recommendedCourse ?? null;
+  const next = course?.next ?? null;
+  const placeName = stamp?.placeName ?? explanation.data?.name ?? place?.name ?? "";
+  const stampText = stampStatus(visit.error, Boolean(stamp), stamp?.firstVisit ?? false);
 
   return (
     <Screen>
-      <TopBar title={explain ? EXPLANATION.spot : place.name} />
+      <TopBar title={placeName} />
       <ScreenBody className="gap-3!">
         {explain && (
           <>
@@ -58,8 +91,18 @@ export default function VisitPage({ params, searchParams }: Props) {
               <Chip>{t("{language}로 번역", { language: t(languageLabel(language)) })}</Chip>
             </ChipGroup>
             <Card className="gap-2! leading-[1.45]">
-              <p className="text-body font-medium text-ink">{EXPLANATION.translated}</p>
-              <p className="text-label text-fg-caption">{EXPLANATION.original}</p>
+              {explanation.data ? (
+                <>
+                  <p className="text-body font-medium whitespace-pre-line text-ink">{explanation.data.text}</p>
+                  {explanation.data.text !== explanation.data.original && (
+                    <p className="text-label whitespace-pre-line text-fg-caption">{explanation.data.original}</p>
+                  )}
+                </>
+              ) : (
+                <p className="text-label text-fg-caption">
+                  {explanation.isError ? t("불러오지 못했어요. 잠시 후 다시 시도해 주세요.") : t("불러오는 중…")}
+                </p>
+              )}
             </Card>
           </>
         )}
@@ -69,30 +112,35 @@ export default function VisitPage({ params, searchParams }: Props) {
             {t("도장")}
           </div>
           <div className="flex min-w-0 flex-1 flex-col gap-0.5 leading-[1.45]">
-            <p className="text-body-lg font-bold text-fg">{t("방문 도장 획득!")}</p>
+            <p className="text-body-lg font-bold text-fg">{t(stampText.title)}</p>
             <p className="truncate text-caption text-fg-muted">
-              {place.name} · {dateLabel(new Date(), lang)}
+              {stamp ? `${stamp.placeName} · ${dateLabel(parseDate(stamp.visitedDate), lang)}` : stampText.sub && t(stampText.sub)}
             </p>
           </div>
         </Card>
+        {visit.isError && (
+          <Button variant="text" onClick={() => visit.refetch()} disabled={visit.isFetching}>
+            {t("다시 시도")}
+          </Button>
+        )}
 
-        {inCourse && (
+        {course && (
           <div className="flex flex-col gap-2 rounded-box bg-surface-sunken p-4">
             <p className="text-label leading-[1.45] font-bold text-fg">
-              {INDEPENDENCE_COURSE.name} {doneIds.length} / {stops.length}
+              {course.name} {course.visitedCount} / {course.totalCount}
             </p>
-            <CourseSteps stops={stops} doneIds={doneIds} />
+            <CourseSteps {...courseStops(course.stops)} />
           </div>
         )}
       </ScreenBody>
       <ScreenFooter className="flex-row!">
         {/* 트리거 11: 한걸음 남기기 → N3 / 트리거 12: 다음 장소 → 04 복귀 */}
-        <Button variant="secondary" className="flex-1" onClick={() => router.push(`/visit/${place.id}/review`)}>
+        <Button variant="secondary" className="flex-1" onClick={() => router.push(`/visit/${placeId}/review`)}>
           {t("한걸음 남기기")}
         </Button>
         {next ? (
-          <Button className="flex-1" onClick={() => router.push(`/scene/${next.id}`)}>
-            {t("다음: {place} {walk}", { place: next.shortName, walk: next.id === EXPLANATION.next.place.id ? EXPLANATION.next.walk : "" })}
+          <Button className="flex-1" onClick={() => router.push(`/scene/${next.placeId}`)}>
+            {t("다음: {place} {walk}", { place: next.name, walk: t("{minutes}분", { minutes: next.walkingMinutes }) })}
           </Button>
         ) : (
           <Button className="flex-1" onClick={() => router.push("/log")}>
@@ -102,4 +150,14 @@ export default function VisitPage({ params, searchParams }: Props) {
       </ScreenFooter>
     </Screen>
   );
+}
+
+function stampStatus(error: Error | null, done: boolean, firstVisit: boolean): { title: MsgKey; sub?: MsgKey } {
+  if (done) return { title: firstVisit ? "방문 도장 획득!" : "다시 왔어요" };
+  if (!error) return { title: "도장을 찍는 중…" };
+  if (error instanceof NoLocationError)
+    return { title: "아직 도장을 받을 수 없어요", sub: "위치를 확인할 수 없어요. 위치 권한을 확인해 주세요." };
+  if (error instanceof ApiError && error.code === "VISIT_TOO_FAR")
+    return { title: "아직 도장을 받을 수 없어요", sub: "장소 가까이에서 다시 시도해 주세요" };
+  return { title: "아직 도장을 받을 수 없어요", sub: "불러오지 못했어요. 잠시 후 다시 시도해 주세요." };
 }

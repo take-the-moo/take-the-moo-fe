@@ -5,7 +5,7 @@ import { BottomSheet, Button, InfoBox, Screen } from "@/components/ui";
 import { useT } from "@/i18n";
 
 // 00 시작 선택 · F1 — Figma 1:160
-// 첫 실행에서만 보인다(홈이 익명 사용자 없음을 확인하고 보냄). 가입·비가입 모두 01 처음 설정으로 모인다.
+// 로그인하지 않았으면 보인다(Providers가 보냄). 가입하기 → N1 → N2 → 01에서 가입 완료, 로그인 → 로그인 화면.
 export default function StartPage() {
   const router = useRouter();
   const t = useT();
@@ -29,11 +29,11 @@ export default function StartPage() {
         </InfoBox>
         {/* 트리거 1·2 */}
         <Button onClick={() => router.push("/signup")}>{t("가입하기")}</Button>
-        <Button variant="secondary" onClick={() => router.push("/setup")}>
-          {t("가입 없이 시작하기")}
+        <Button variant="secondary" onClick={() => router.push("/login")}>
+          {t("로그인")}
         </Button>
         <p className="text-center text-caption text-fg-muted">
-          {t("가입 없이도 모든 기능을 쓸 수 있어요 · 이름·연락처는 받지 않아요")}
+          {t("아이디·비밀번호로 시작해요 · 연락처는 받지 않아요")}
         </p>
       </BottomSheet>
     </Screen>
