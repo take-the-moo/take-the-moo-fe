@@ -1,10 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Noto_Sans_KR } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import Providers from "./providers";
 
-const notoSansKR = Noto_Sans_KR({
-  subsets: ["latin", "vietnamese"],
+// 시연 환경의 네트워크와 무관하게 같은 글꼴이 나오도록 로컬 파일을 쓴다.
+// 가변 폰트(wght 100–900) 한 파일로 모든 굵기를 처리한다. 한글·베트남어 글리프 포함.
+const notoSansKR = localFont({
+  src: "./fonts/NotoSansKR-VariableFont_wght.ttf",
+  weight: "100 900",
   display: "swap",
 });
 
